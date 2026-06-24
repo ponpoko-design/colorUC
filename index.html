@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v260624.1600 -->
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -342,10 +343,10 @@ body {
 }
 
 @media (max-width: 600px) {
-  body { font-size: 16px; }
+  body { font-size: 17px; }
   #app-header { padding: 10px 14px 8px; }
-  #app-header h1 { font-size: 14px; }
-  #progress-text { font-size: 11px; }
+  #app-header h1 { font-size: 15px; }
+  #progress-text { font-size: 12px; }
 
   /* モードバー：2行グリッドに変更 */
   #mode-bar {
@@ -355,40 +356,63 @@ body {
     padding: 10px 12px;
     overflow-x: visible;
   }
-  .mode-btn { font-size: 12px; padding: 8px 6px; text-align: center; }
+  .mode-btn { font-size: 14px; padding: 10px 6px; text-align: center; }
 
   /* カード */
   .quiz-card { padding: 16px 14px 14px; }
-  .question-text { font-size: 17px; }
-  .answer-main { font-size: 15px; }
-  .answer-detail ul li { font-size: 14px; }
+  .card-type { font-size: 13px; }
+  .card-num { font-size: 13px; }
+  .card-chapter { font-size: 12px; }
+  .question-text { font-size: 19px; }
+  .answer-label { font-size: 13px; }
+  .answer-main { font-size: 17px; }
+  .answer-detail ul li { font-size: 15px; }
 
   /* 対比カード：縦1列に変更 */
   .compare-grid { grid-template-columns: 1fr; }
-  .compare-cell ul li { font-size: 14px; }
+  .compare-cell h3 { font-size: 15px; }
+  .compare-cell ul li { font-size: 15px; }
+
+  /* 語呂合わせ */
+  .memory-tip { font-size: 15px; }
+  .memory-tip-label { font-size: 13px; }
 
   /* ボタン */
-  .btn { font-size: 14px; padding: 12px 10px; }
+  .btn { font-size: 16px; padding: 14px 10px; }
   .btn-row { gap: 7px; }
+
+  /* 図解ボタン（カード内） */
+  .diag-btn { font-size: 14px !important; padding: 8px 14px !important; }
+
+  /* 図解タブバー */
+  .diag-tab { font-size: 13px !important; padding: 9px 12px !important; }
+
+  /* 図解エリア内のセクションラベル */
+  .caf-sec { font-size: 13px !important; }
+  .caf-arrow-box { font-size: 13px !important; }
+  .caf-ph { font-size: 13px !important; }
 
   /* モーダル */
   #diagram-modal { padding: 8px; }
   #diagram-modal-inner { max-height: 92vh; border-radius: 10px; }
   #diagram-modal-header { padding: 12px 14px; }
-  #diagram-modal-title { font-size: 13px; }
+  #diagram-modal-title { font-size: 14px; }
   #diagram-modal-body { padding: 8px 4px 16px; overflow-x: hidden; }
 
   /* SVG はみ出し防止 */
   #diagram-modal-body svg { max-width: 100%; height: auto; }
   #diagram-modal-body div { max-width: 100%; overflow-x: hidden; }
 
-  /* 図解ボタン */
-  .diag-btn { font-size: 12px !important; padding: 5px 10px !important; }
-
   /* メモ欄 */
-  .note-field { font-size: 15px; min-height: 72px; }
-  .note-label { font-size: 13px; }
+  .note-field { font-size: 16px; min-height: 80px; }
+  .note-label { font-size: 14px; }
   .source-bar { font-size: 12px; }
+
+  /* マスター済みバッジ */
+  .mastered-badge { font-size: 12px; }
+
+  /* 進捗テキスト */
+  #progress-text { font-size: 12px; }
 }
 
 /* ── 図解モーダル ── */
@@ -439,6 +463,8 @@ body {
 }
 #diagram-modal-body {
   padding: 12px 8px 20px;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 </style>
 </head>
@@ -476,6 +502,97 @@ body {
 <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <script>
+// ============================================================
+//  図解モード
+// ============================================================
+const DIAGRAMS = [
+  { id:'d01', title:'PCCS 色相環（24色相）',      subtitle:'各色をタップで番号・名前を確認', related:['q05','q16','b04','b07'] },
+  { id:'d02', title:'PCCSトーンマップ（12トーン）', subtitle:'横軸＝彩度、縦軸＝明度。タップで詳細表示', related:['q05','q16','b04'] },
+  { id:'d03', title:'色立体の断面図',              subtitle:'無彩色軸・彩度・純色の位置関係', related:['q05','q17'] },
+  { id:'d04', title:'錐体と混同色線のつながり',    subtitle:'錐体の異常→P型/D型それぞれの混同の仕組み', related:['q03','q04','q06','q07','q08','q11','q22'] },
+];
+
+function renderDiagramsMode(main) {
+  const intro = document.createElement('div');
+  intro.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;font-size:13px;color:var(--text-sub);';
+  intro.innerHTML = '<strong style="color:var(--text);font-size:14px;">🎨 図解モード</strong><br>タブで図を切り替え。各図の「関連問題」から問題に戻れます。';
+  main.appendChild(intro);
+
+  // タブバー
+  const tabBar = document.createElement('div');
+  tabBar.style.cssText = 'display:flex;gap:6px;overflow-x:auto;margin-bottom:16px;padding-bottom:2px;';
+  
+  // 図表示エリア
+  const diagramArea = document.createElement('div');
+  diagramArea.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;';
+
+  let activeId = DIAGRAMS[0].id;
+
+  function showDiagram(id) {
+    activeId = id;
+    // タブのactive状態更新
+    tabBar.querySelectorAll('.diag-tab').forEach(btn => {
+      const isActive = btn.dataset.id === id;
+      btn.style.background = isActive ? 'var(--accent)' : 'var(--surface)';
+      btn.style.color = isActive ? '#fff' : 'var(--text-sub)';
+      btn.style.borderColor = isActive ? 'var(--accent)' : 'var(--border)';
+      btn.style.fontWeight = isActive ? '700' : '400';
+    });
+    // 図を描画
+    diagramArea.innerHTML = '';
+    const d = DIAGRAMS.find(x => x.id === id);
+    if (!d) return;
+
+    // ヘッダー
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'padding:14px 16px 12px;border-bottom:1px solid var(--border);';
+    hdr.innerHTML = `<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px;">${d.title}</div><div style="font-size:12px;color:var(--text-sub);">${d.subtitle}</div>`;
+    diagramArea.appendChild(hdr);
+
+    // 図本体
+    const DIAGRAM_FNS = { d01:getDiagramPCSS, d02:getDiagramTone, d03:getDiagramSolid, d04:getDiagramConesAndConfusion };
+    const body = document.createElement('div');
+    body.style.cssText = 'padding:12px 8px 16px;';
+    const el = DIAGRAM_FNS[id]();
+    if (typeof el === 'string') body.innerHTML = el;
+    else body.appendChild(el);
+    diagramArea.appendChild(body);
+
+    // 関連問題
+    const relWrap = document.createElement('div');
+    relWrap.style.cssText = 'padding:10px 16px 14px;border-top:1px solid var(--border);';
+    relWrap.innerHTML = '<span style="font-size:11px;color:var(--text-sub);margin-right:8px;">関連問題：</span>';
+    d.related.forEach(qid => {
+      const q = QUESTIONS.find(x => x.id === qid);
+      if (!q) return;
+      const num = QUESTIONS.indexOf(q) + 1;
+      const btn = document.createElement('button');
+      btn.textContent = 'Q' + num;
+      btn.style.cssText = 'background:var(--accent-light);border:1px solid #C8D8EE;border-radius:20px;padding:3px 10px;font-size:11px;color:var(--accent);cursor:pointer;font-family:inherit;margin:2px;';
+      btn.addEventListener('click', () => jumpToQuestion(qid));
+      relWrap.appendChild(btn);
+    });
+    diagramArea.appendChild(relWrap);
+  }
+
+  // タブボタンを生成
+  DIAGRAMS.forEach(d => {
+    const btn = document.createElement('button');
+    btn.className = 'diag-tab';
+    btn.dataset.id = d.id;
+    btn.textContent = d.title.length > 10 ? d.title.slice(0,10)+'…' : d.title;
+    btn.style.cssText = 'flex-shrink:0;padding:8px 12px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface);font-size:12px;cursor:pointer;font-family:inherit;color:var(--text-sub);white-space:nowrap;transition:all .15s;';
+    btn.addEventListener('click', () => showDiagram(d.id));
+    tabBar.appendChild(btn);
+  });
+
+  main.appendChild(tabBar);
+  main.appendChild(diagramArea);
+
+  // 最初の図を表示
+  showDiagram(activeId);
+}
+
 // ============================================================
 //  問題データ
 // ============================================================
@@ -1076,97 +1193,6 @@ renderMain();
 
 
 // ============================================================
-//  図解モード
-// ============================================================
-const DIAGRAMS = [
-  { id:'d01', title:'PCCS 色相環（24色相）',      subtitle:'各色をタップで番号・名前を確認', related:['q05','q16','b04','b07'] },
-  { id:'d02', title:'PCCSトーンマップ（12トーン）', subtitle:'横軸＝彩度、縦軸＝明度。タップで詳細表示', related:['q05','q16','b04'] },
-  { id:'d03', title:'色立体の断面図',              subtitle:'無彩色軸・彩度・純色の位置関係', related:['q05','q17'] },
-  { id:'d04', title:'錐体と混同色線のつながり',    subtitle:'錐体の異常→P型/D型それぞれの混同の仕組み', related:['q03','q04','q06','q07','q08','q11','q22'] },
-];
-
-function renderDiagramsMode(main) {
-  const intro = document.createElement('div');
-  intro.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;font-size:13px;color:var(--text-sub);';
-  intro.innerHTML = '<strong style="color:var(--text);font-size:14px;">🎨 図解モード</strong><br>タブで図を切り替え。各図の「関連問題」から問題に戻れます。';
-  main.appendChild(intro);
-
-  // タブバー
-  const tabBar = document.createElement('div');
-  tabBar.style.cssText = 'display:flex;gap:6px;overflow-x:auto;margin-bottom:16px;padding-bottom:2px;';
-  
-  // 図表示エリア
-  const diagramArea = document.createElement('div');
-  diagramArea.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;';
-
-  let activeId = DIAGRAMS[0].id;
-
-  function showDiagram(id) {
-    activeId = id;
-    // タブのactive状態更新
-    tabBar.querySelectorAll('.diag-tab').forEach(btn => {
-      const isActive = btn.dataset.id === id;
-      btn.style.background = isActive ? 'var(--accent)' : 'var(--surface)';
-      btn.style.color = isActive ? '#fff' : 'var(--text-sub)';
-      btn.style.borderColor = isActive ? 'var(--accent)' : 'var(--border)';
-      btn.style.fontWeight = isActive ? '700' : '400';
-    });
-    // 図を描画
-    diagramArea.innerHTML = '';
-    const d = DIAGRAMS.find(x => x.id === id);
-    if (!d) return;
-
-    // ヘッダー
-    const hdr = document.createElement('div');
-    hdr.style.cssText = 'padding:14px 16px 12px;border-bottom:1px solid var(--border);';
-    hdr.innerHTML = `<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px;">${d.title}</div><div style="font-size:12px;color:var(--text-sub);">${d.subtitle}</div>`;
-    diagramArea.appendChild(hdr);
-
-    // 図本体
-    const DIAGRAM_FNS = { d01:getDiagramPCSS, d02:getDiagramTone, d03:getDiagramSolid, d04:getDiagramConesAndConfusion };
-    const body = document.createElement('div');
-    body.style.cssText = 'padding:12px 8px 16px;';
-    const el = DIAGRAM_FNS[id]();
-    if (typeof el === 'string') body.innerHTML = el;
-    else body.appendChild(el);
-    diagramArea.appendChild(body);
-
-    // 関連問題
-    const relWrap = document.createElement('div');
-    relWrap.style.cssText = 'padding:10px 16px 14px;border-top:1px solid var(--border);';
-    relWrap.innerHTML = '<span style="font-size:11px;color:var(--text-sub);margin-right:8px;">関連問題：</span>';
-    d.related.forEach(qid => {
-      const q = QUESTIONS.find(x => x.id === qid);
-      if (!q) return;
-      const num = QUESTIONS.indexOf(q) + 1;
-      const btn = document.createElement('button');
-      btn.textContent = 'Q' + num;
-      btn.style.cssText = 'background:var(--accent-light);border:1px solid #C8D8EE;border-radius:20px;padding:3px 10px;font-size:11px;color:var(--accent);cursor:pointer;font-family:inherit;margin:2px;';
-      btn.addEventListener('click', () => jumpToQuestion(qid));
-      relWrap.appendChild(btn);
-    });
-    diagramArea.appendChild(relWrap);
-  }
-
-  // タブボタンを生成
-  DIAGRAMS.forEach(d => {
-    const btn = document.createElement('button');
-    btn.className = 'diag-tab';
-    btn.dataset.id = d.id;
-    btn.textContent = d.title.length > 10 ? d.title.slice(0,10)+'…' : d.title;
-    btn.style.cssText = 'flex-shrink:0;padding:7px 12px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface);font-size:12px;cursor:pointer;font-family:inherit;color:var(--text-sub);white-space:nowrap;transition:all .15s;';
-    btn.addEventListener('click', () => showDiagram(d.id));
-    tabBar.appendChild(btn);
-  });
-
-  main.appendChild(tabBar);
-  main.appendChild(diagramArea);
-
-  // 最初の図を表示
-  showDiagram(activeId);
-}
-
-// ============================================================
 //  図解モーダル
 // ============================================================
 
@@ -1508,15 +1534,15 @@ function getDiagramConesAndConfusion() {
 
   const html = `
   <style>
-    .caf-wrap { font-family:'Meiryo UI',sans-serif; }
+    .caf-wrap { font-family:'Meiryo UI',sans-serif; max-width:100%; overflow:hidden; box-sizing:border-box; }
     .caf-sec  { font-size:11px; font-weight:500; color:#888; padding:6px 8px 3px; display:flex; align-items:center; gap:5px; }
     .caf-sec b { display:inline-block; width:3px; height:12px; border-radius:2px; background:#aaa; }
-    .caf-arrow-row { display:flex; justify-content:center; gap:40px; padding:2px 0 3px; }
+    .caf-arrow-row { display:flex; justify-content:center; gap:16px; padding:2px 0 3px; flex-wrap:wrap; }
     .caf-arrow-box { text-align:center; font-size:11px; line-height:1.4; }
     .caf-panels { display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:0 4px; }
     .caf-panel { border:1px solid #e0e0e0; border-radius:8px; overflow:hidden; }
     .caf-ph { padding:6px 10px 5px; border-bottom:1px solid #eee; font-size:11px; font-weight:500; }
-    @media(max-width:480px){ .caf-panels{grid-template-columns:1fr;} }
+    @media(max-width:600px){ .caf-panels{grid-template-columns:1fr;} }
   </style>
   <div class="caf-wrap">
 
