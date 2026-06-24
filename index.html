@@ -439,8 +439,6 @@ body {
 }
 #diagram-modal-body {
   padding: 12px 8px 20px;
-  overflow-x: hidden;
-  max-width: 100%;
 }
 </style>
 </head>
@@ -1156,7 +1154,7 @@ function renderDiagramsMode(main) {
     btn.className = 'diag-tab';
     btn.dataset.id = d.id;
     btn.textContent = d.title.length > 10 ? d.title.slice(0,10)+'…' : d.title;
-    btn.style.cssText = 'flex-shrink:0;padding:8px 12px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface);font-size:12px;cursor:pointer;font-family:inherit;color:var(--text-sub);white-space:nowrap;transition:all .15s;';
+    btn.style.cssText = 'flex-shrink:0;padding:7px 12px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface);font-size:12px;cursor:pointer;font-family:inherit;color:var(--text-sub);white-space:nowrap;transition:all .15s;';
     btn.addEventListener('click', () => showDiagram(d.id));
     tabBar.appendChild(btn);
   });
@@ -1510,15 +1508,15 @@ function getDiagramConesAndConfusion() {
 
   const html = `
   <style>
-    .caf-wrap { font-family:'Meiryo UI',sans-serif; max-width:100%; overflow:hidden; box-sizing:border-box; }
+    .caf-wrap { font-family:'Meiryo UI',sans-serif; }
     .caf-sec  { font-size:11px; font-weight:500; color:#888; padding:6px 8px 3px; display:flex; align-items:center; gap:5px; }
     .caf-sec b { display:inline-block; width:3px; height:12px; border-radius:2px; background:#aaa; }
-    .caf-arrow-row { display:flex; justify-content:center; gap:16px; padding:2px 0 3px; flex-wrap:wrap; }
+    .caf-arrow-row { display:flex; justify-content:center; gap:40px; padding:2px 0 3px; }
     .caf-arrow-box { text-align:center; font-size:11px; line-height:1.4; }
     .caf-panels { display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:0 4px; }
     .caf-panel { border:1px solid #e0e0e0; border-radius:8px; overflow:hidden; }
     .caf-ph { padding:6px 10px 5px; border-bottom:1px solid #eee; font-size:11px; font-weight:500; }
-    @media(max-width:600px){ .caf-panels{grid-template-columns:1fr;} }
+    @media(max-width:480px){ .caf-panels{grid-template-columns:1fr;} }
   </style>
   <div class="caf-wrap">
 
