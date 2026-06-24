@@ -165,6 +165,13 @@ rt { font-size: 0.55em; color: var(--text-sub); }
   outline: none;
   border-color: var(--accent);
 }
+.note-status {
+  font-size: 11px;
+  color: var(--text-sub);
+  text-align: right;
+  margin-top: 3px;
+  transition: color .3s;
+}
 
 /* ── クイズカード ── */
 .quiz-card {
@@ -1370,13 +1377,13 @@ function saveNote(id, val) {
 const _noteTimers = {};
 function scheduleNoteSave(id, val) {
   clearTimeout(_noteTimers[id]);
-  const ta = document.getElementById('note-' + id);
-  if(ta) ta.placeholder = 'ここに自由にメモを書けます… 3秒後に自動保存します';
+  const st = document.getElementById('note-status-' + id);
+  if(st) { st.textContent = '3秒後に自動保存します'; st.style.color = 'var(--text-sub)'; }
   _noteTimers[id] = setTimeout(() => {
     saveNote(id, val);
-    if(ta) ta.placeholder = 'ここに自由にメモを書けます… 保存しました ✓';
+    if(st) { st.textContent = '保存しました ✓'; st.style.color = 'var(--green)'; }
     setTimeout(() => {
-      if(ta) ta.placeholder = 'ここに自由にメモを書けます… 3秒後に自動保存します';
+      if(st) { st.textContent = '3秒後に自動保存します'; st.style.color = 'var(--text-sub)'; }
     }, 2000);
   }, 3000);
 }
@@ -1611,7 +1618,8 @@ function buildCard(q, num) {
     </div>
     ${btnHTML}
     <div class="note-area">
-      <textarea class="note-field" id="note-${q.id}" placeholder="ここに自由にメモを書けます… 3秒後に自動保存します" oninput="scheduleNoteSave('${q.id}', this.value)">${loadNote('${q.id}')}</textarea>
+      <textarea class="note-field" id="note-${q.id}" placeholder="ここに自由にメモを書けます…" oninput="scheduleNoteSave('${q.id}', this.value)">${loadNote('${q.id}')}</textarea>
+      <div class="note-status" id="note-status-${q.id}">3秒後に自動保存します</div>
     </div>
   `;
 }
