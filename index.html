@@ -1542,8 +1542,17 @@ function getDiagramSolid() {
   // タップ時にSVGをライトボックスで表示
   svgWrap.addEventListener('click', () => {
     const svgEl = svgWrap.querySelector('svg');
+    // 白背景のrectを一時的に追加
+    const ns = 'http://www.w3.org/2000/svg';
+    const bg = document.createElementNS(ns, 'rect');
+    const vb = svgEl.getAttribute('viewBox').split(' ');
+    bg.setAttribute('x', vb[0]); bg.setAttribute('y', vb[1]);
+    bg.setAttribute('width', vb[2]); bg.setAttribute('height', vb[3]);
+    bg.setAttribute('fill', 'white');
+    svgEl.insertBefore(bg, svgEl.firstChild);
     const serializer = new XMLSerializer();
     const svgStr = serializer.serializeToString(svgEl);
+    svgEl.removeChild(bg); // 元に戻す
     const blob = new Blob([svgStr], {type:'image/svg+xml'});
     const url = URL.createObjectURL(blob);
     openImgLightbox(url);
