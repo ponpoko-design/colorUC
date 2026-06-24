@@ -137,6 +137,35 @@ body {
 ruby { ruby-align: center; }
 rt { font-size: 0.55em; color: var(--text-sub); }
 
+/* ── メモ欄 ── */
+.note-area {
+  margin: 12px 0 4px;
+}
+.note-label {
+  font-size: 12px;
+  color: var(--text-sub);
+  margin-bottom: 5px;
+}
+.note-field {
+  width: 100%;
+  min-height: 72px;
+  padding: 9px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--bg);
+  color: var(--text);
+  resize: vertical;
+  box-sizing: border-box;
+  transition: border-color .15s;
+  line-height: 1.6;
+}
+.note-field:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
 /* ── クイズカード ── */
 .quiz-card {
   background: var(--surface);
@@ -1332,6 +1361,29 @@ const LS_KEY = 'uc_quiz_progress';
 let state = {}; // { [id]: 'ok' | 'ng' | undefined }
 let currentMode = 'all';
 
+// ============================================================
+//  メモ保存・読み込み
+// ============================================================
+function saveNote(id, val) {
+  try { localStorage.setItem('note_' + id, val); } catch(e) {}
+}
+const _noteTimers = {};
+function scheduleNoteSave(id, val) {
+  clearTimeout(_noteTimers[id]);
+  const ta = document.getElementById('note-' + id);
+  if(ta) ta.placeholder = 'ここに自由にメモを書けます… 3秒後に自動保存します';
+  _noteTimers[id] = setTimeout(() => {
+    saveNote(id, val);
+    if(ta) ta.placeholder = 'ここに自由にメモを書けます… 保存しました ✓';
+    setTimeout(() => {
+      if(ta) ta.placeholder = 'ここに自由にメモを書けます… 3秒後に自動保存します';
+    }, 2000);
+  }, 3000);
+}
+function loadNote(id) {
+  try { return localStorage.getItem('note_' + id) || ''; } catch(e) { return ''; }
+}
+
 function loadState() {
   try { state = JSON.parse(localStorage.getItem(LS_KEY) || '{}'); } catch(e){ state={}; }
 }
@@ -1558,6 +1610,9 @@ function buildCard(q, num) {
       ${q.memory||''}
     </div>
     ${btnHTML}
+    <div class="note-area">
+      <textarea class="note-field" id="note-${q.id}" placeholder="ここに自由にメモを書けます… 3秒後に自動保存します" oninput="scheduleNoteSave('${q.id}', this.value)">${loadNote('${q.id}')}</textarea>
+    </div>
   `;
 }
 
