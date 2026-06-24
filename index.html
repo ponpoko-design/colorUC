@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>色彩検定 UC級｜頻出問題まとめ</title>
+<style>
+  :root {
+    --bg: #F7F6F3;
+    --surface: #FFFFFF;
+    --border: #E0DDD7;
+    --accent: #3B6EA5;
+    --accent-light: #EAF0F8;
+    --accent2: #C85A2A;
+    --accent2-light: #FDF0EB;
+    --text: #1E1E1E;
+    --text-sub: #666560;
+    --tag-bg: #3B6EA5;
+    --tag-text: #fff;
+    --answer-bg: #F0F6FF;
+    --answer-border: #3B6EA5;
+    --source-bg: #F5F5F5;
+    --source-text: #888;
+    --edit-border: #C8D8EE;
+    --edit-focus: #3B6EA5;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Meiryo UI', 'Hiragino Kaku Gothic ProN', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.7;
+    padding: 24px 16px 60px;
+  }
+
+  header {
+    max-width: 860px;
+    margin: 0 auto 32px;
+    padding: 28px 28px 24px;
+    background: var(--accent);
+    border-radius: var(--radius);
+    color: #fff;
+  }
+  header .label {
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    opacity: .75;
+    margin-bottom: 6px;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: .03em;
+    margin-bottom: 10px;
+  }
+  header p {
+    font-size: 12.5px;
+    opacity: .85;
+    line-height: 1.6;
+  }
+
+  .toc {
+    max-width: 860px;
+    margin: 0 auto 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+  }
+  .toc h2 {
+    font-size: 12px;
+    color: var(--text-sub);
+    letter-spacing: .1em;
+    margin-bottom: 10px;
+  }
+  .toc ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .toc ul li a {
+    display: inline-block;
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: var(--accent-light);
+    color: var(--accent);
+    text-decoration: none;
+    border: 1px solid #C8D8EE;
+    transition: background .15s;
+  }
+  .toc ul li a:hover { background: #D9E8F7; }
+
+  .chapter {
+    max-width: 860px;
+    margin: 0 auto 36px;
+  }
+  .chapter-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--accent);
+  }
+  .chapter-num {
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: .08em;
+  }
+  .chapter-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .qa-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+
+  .qa-q {
+    padding: 14px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+    transition: background .12s;
+  }
+  .qa-q:hover { background: #FAFAFA; }
+
+  .q-badge {
+    flex-shrink: 0;
+    background: var(--accent2);
+    color: #fff;
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 4px;
+    margin-top: 2px;
+    letter-spacing: .06em;
+  }
+  .q-text {
+    font-size: 13.5px;
+    font-weight: 600;
+    flex: 1;
+    line-height: 1.55;
+  }
+  .toggle-icon {
+    flex-shrink: 0;
+    font-size: 16px;
+    color: var(--text-sub);
+    transition: transform .2s;
+    margin-top: 1px;
+  }
+  .qa-card.open .toggle-icon { transform: rotate(180deg); }
+
+  .qa-body {
+    display: none;
+    border-top: 1px solid var(--border);
+  }
+  .qa-card.open .qa-body { display: block; }
+
+  .answer-block {
+    background: var(--answer-bg);
+    border-left: 4px solid var(--answer-border);
+    padding: 14px 18px 12px;
+  }
+  .a-badge {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    letter-spacing: .06em;
+  }
+  .answer-summary {
+    font-size: 13.5px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    line-height: 1.5;
+    color: #1a3a5c;
+  }
+  .answer-detail {
+    font-size: 13px;
+    color: var(--text);
+  }
+  .answer-detail ul {
+    padding-left: 0;
+    list-style: none;
+    margin-top: 6px;
+  }
+  .answer-detail ul li {
+    padding: 3px 0 3px 16px;
+    position: relative;
+    font-size: 12.5px;
+    color: #333;
+    line-height: 1.55;
+  }
+  .answer-detail ul li::before {
+    content: '・';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+  }
+
+  .note-area {
+    padding: 12px 18px 14px;
+    background: #FAFAF9;
+    border-top: 1px dashed var(--edit-border);
+  }
+  .note-label {
+    font-size: 11px;
+    color: var(--text-sub);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .note-label::before { content: '✏️'; font-size: 12px; }
+  .note-field {
+    width: 100%;
+    min-height: 56px;
+    border: 1.5px solid var(--edit-border);
+    border-radius: var(--radius-sm);
+    padding: 9px 12px;
+    font-family: 'Meiryo UI', sans-serif;
+    font-size: 12.5px;
+    color: var(--text);
+    background: #fff;
+    resize: vertical;
+    transition: border-color .15s;
+    line-height: 1.55;
+  }
+  .note-field:focus {
+    outline: none;
+    border-color: var(--edit-focus);
+    box-shadow: 0 0 0 3px rgba(59,110,165,.1);
+  }
+  .note-field::placeholder { color: #BBB; }
+
+  .source-bar {
+    padding: 8px 18px;
+    background: var(--source-bg);
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--source-text);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+  .source-bar a {
+    color: #888;
+    text-decoration: underline;
+    word-break: break-all;
+  }
+  .source-bar a:hover { color: var(--accent); }
+
+  .tip-box {
+    max-width: 860px;
+    margin: 0 auto 28px;
+    background: linear-gradient(135deg, #EAF4F0, #E8EFF8);
+    border: 1px solid #B8D8C8;
+    border-radius: var(--radius);
+    padding: 18px 22px;
+  }
+  .tip-box h3 {
+    font-size: 13px;
+    color: #2A6A4A;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .tip-box ul {
+    list-style: none;
+    padding: 0;
+  }
+  .tip-box ul li {
+    font-size: 12.5px;
+    padding: 4px 0 4px 18px;
+    position: relative;
+    color: #1E3A2A;
+    line-height: 1.55;
+  }
+  .tip-box ul li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #2A8A5A;
+    font-weight: 700;
+  }
+
+  footer {
+    max-width: 860px;
+    margin: 0 auto;
+    font-size: 11px;
+    color: #AAA;
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 600px) {
+    header h1 { font-size: 18px; }
+    .q-text { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="label">試験対策まとめ</div>
+  <h1>🎨 色彩検定 UC級｜頻出問題＆解答集</h1>
+  <p>試験に出やすいテーマを章別に整理。各問題には結論→補足の順で解答を記載。<br>「メモ欄」は自由に書き込めます。</p>
+</header>
+
+<!-- 目次 -->
+<div class="toc">
+  <h2>CONTENTS</h2>
+  <ul>
+    <li><a href="#ch1">Ch.1 色のUDとは</a></li>
+    <li><a href="#ch2">Ch.2 色が見えるしくみ</a></li>
+    <li><a href="#ch3">Ch.3 色の表し方</a></li>
+    <li><a href="#ch4">Ch.4 色覚の多様性</a></li>
+    <li><a href="#ch5">Ch.5 高齢者の見え方</a></li>
+    <li><a href="#ch6">Ch.6 見分けにくい色と改善</a></li>
+    <li><a href="#ch7">Ch.7 UDの進め方</a></li>
+    <li><a href="#ex1">＋ 深掘り：用語・穴埋め</a></li>
+    <li><a href="#ex2">＋ 深掘り：数値・データ</a></li>
+    <li><a href="#ex3">＋ 深掘り：事例・場面</a></li>
+    <li><a href="#ex4">＋ 深掘り：記述式対策</a></li>
+  </ul>
+</div>
+
+<!-- Ch.1 -->
+<div class="chapter" id="ch1">
+  <div class="chapter-head">
+    <span class="chapter-num">Ch.1</span>
+    <span class="chapter-title">色のユニバーサルデザインとは</span>
+  </div>
+
+  <!-- Q1 -->
+  <div class="qa-card open">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q1</span>
+      <span class="q-text">ユニバーサルデザイン（UD）とバリアフリーの違いは？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">UDは「最初からすべての人が使いやすい設計」、バリアフリーは「障壁を後から取り除く対処」という点で異なる。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>バリアフリー：特定の障害に対し、後から障壁を除去する考え方</li>
+            <li>UD：年齢・性別・国籍・障害の有無にかかわらず、最初から誰もが使えるよう設計</li>
+            <li>色のUD（CUD）：色覚の多様性に配慮し、誰もが見やすい色使いを実現すること</li>
+            <li>UC級では「バリアフリー」ではなく「UD（多様性の尊重）」の視点が重視される</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://www.aft.or.jp/uc/" target="_blank">色彩検定協会公式｜UC級とは</a>　／　<a href="https://shikaku-dojo.lb-product.com/shikisai-uc/articles/faq" target="_blank">資格道場｜UC級FAQ</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q2</span>
+      <span class="q-text">色のUDの「3つのポイント」とは？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">①色を適切に選ぶ、②色以外の情報も併用する、③きちんと伝える（確認する）の3点。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>①色を選ぶ：混同しやすい色の組み合わせを避け、明度差・彩度差を活用する</li>
+            <li>②色以外の情報を使う：形・模様・文字・アイコンなどを色と組み合わせる</li>
+            <li>③きちんと伝える：シミュレーションや当事者確認でデザインを検証する</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://shikaku-dojo.lb-product.com/shikisai-uc/articles/faq" target="_blank">資格道場｜UC級頻出ポイント</a>　／　<a href="https://note.com/y_design21/n/n0ef5dbd8cc96" target="_blank">合格者まとめ帳（note）</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ch.2 -->
+<div class="chapter" id="ch2">
+  <div class="chapter-head">
+    <span class="chapter-num">Ch.2</span>
+    <span class="chapter-title">色が見えるしくみ</span>
+  </div>
+
+  <!-- Q3 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q3</span>
+      <span class="q-text">錐体（すいたい）と杆体（かんたい）の違いは？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">錐体は明所で色を識別する視細胞、杆体は暗所で明暗を識別する視細胞。色の区別は錐体だけが行う。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>錐体：L（長波長・赤）、M（中波長・緑）、S（短波長・青）の3種類</li>
+            <li>杆体：1種類のみ。暗所で機能するが、色の判別はできない</li>
+            <li>中心窩（ちゅうしんか）付近に錐体が集中している</li>
+            <li>L錐体・M錐体のどちらかに異常があると、赤～緑の識別が困難になる</li>
+            <li>試験頻出：L/M/S錐体がどの色に対応するかをセットで覚える</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://shikaku-dojo.lb-product.com/shikisai-uc/articles/faq" target="_blank">資格道場｜色が見える仕組みと色覚の多様性</a>　／　<a href="https://qiita.com/Eto0/items/2a29e2aaf95a707c57dd" target="_blank">Qiita｜UC級受験記（2025冬）</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q4</span>
+      <span class="q-text">可視光線の波長の範囲と色の並びは？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">可視光線は約380〜780nmで、波長が長い順に赤→橙→黄→緑→青→紫と並ぶ。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>赤：約780nm（最も長い）</li>
+            <li>紫：約380nm（最も短い）</li>
+            <li>L錐体は長波長（赤）、M錐体は中波長（緑）、S錐体は短波長（青）に対応</li>
+            <li>試験では「波長の長い順」と「L/M/S錐体の対応色」がよく問われる</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://qiita.com/Eto0/items/2a29e2aaf95a707c57dd" target="_blank">Qiita｜UC級受験記（試験ポイント）</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ch.3 -->
+<div class="chapter" id="ch3">
+  <div class="chapter-head">
+    <span class="chapter-num">Ch.3</span>
+    <span class="chapter-title">色の表し方（色彩基礎）</span>
+  </div>
+
+  <!-- Q5 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q5</span>
+      <span class="q-text">色の三属性とは何か？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">色相・明度・彩度の3つ。これらを調整することで、混同しやすい色を見分けやすくできる。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>色相：赤・青・黄などの色みの違い（色の方向）</li>
+            <li>明度：色の明るさ。高いほど白に近く、低いほど黒に近い</li>
+            <li>彩度：色の鮮やかさ。高いほど純色に近い</li>
+            <li>UC級では「明度差を大きくする」ことが最も基本的な改善手法として頻出</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://note.com/aoyagiayako/n/nbf1ab002b8fe" target="_blank">認定講師による勉強の進め方（note）</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ch.4 -->
+<div class="chapter" id="ch4">
+  <div class="chapter-head">
+    <span class="chapter-num">Ch.4</span>
+    <span class="chapter-title">色覚の多様性</span>
+  </div>
+
+  <!-- Q6 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q6</span>
+      <span class="q-text">色覚の型（C型・P型・D型・T型）の特徴は？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">C型が一般色覚。P型（1型）はL錐体、D型（2型）はM錐体に異常があり、赤と緑を見分けにくい。T型（3型）はS錐体の異常で青と黄の識別が困難。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>C型（3色覚）：一般的な色覚。L・M・S錐体すべて正常</li>
+            <li>P型（1型色覚）：L錐体の異常。赤み～緑の識別が困難</li>
+            <li>D型（2型色覚）：M錐体の異常。赤～緑の識別が困難（日本人男性に最も多い）</li>
+            <li>T型（3型色覚）：S錐体の異常。青～黄の識別が困難。非常に稀</li>
+            <li>日本人男性の約20人に1人（約5%）、女性の約500人に1人（約0.2%）がP型またはD型</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://www.aft.or.jp/uc/" target="_blank">色彩検定協会公式｜UC級（色覚の多様性）</a>　／　<a href="https://kaleidom.theshop.jp/items/70780163" target="_blank">公式テキスト概要（kaleido-m）</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q7</span>
+      <span class="q-text">先天性色覚異常と後天性色覚異常の違いは？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">先天性は遺伝的要因で生まれつき、後天性は疾病・加齢・薬の副作用などで生じる。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>先天性：遺伝子異常。男性に多い（X染色体連鎖）。P型・D型がほとんど</li>
+            <li>後天性：眼疾患（緑内障・糖尿病網膜症など）、加齢、薬の副作用で発症</li>
+            <li>後天性はT型（青黄型）が多い傾向がある</li>
+            <li>加齢による水晶体の黄変もT型に近い色の見え方の変化をもたらす</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://www.aft.or.jp/pages/official-product-orders/uc-revision" target="_blank">色彩検定協会｜UC級テキスト改訂内容</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ch.5 -->
+<div class="chapter" id="ch5">
+  <div class="chapter-head">
+    <span class="chapter-num">Ch.5</span>
+    <span class="chapter-title">高齢者の見え方</span>
+  </div>
+
+  <!-- Q8 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q8</span>
+      <span class="q-text">加齢が色の見え方に与える主な影響は？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">水晶体の黄変・白内障・コントラスト感度の低下により、特に青色系の見え方が変化し、色の識別力が落ちる。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>水晶体の黄変：黄色がかって見えるようになり、青〜紫が識別しにくくなる</li>
+            <li>白内障：水晶体の混濁により全体が白くかすんで見える</li>
+            <li>コントラスト感度の低下：明暗の差が小さいと区別しにくくなる</li>
+            <li>高齢者が見分けにくい例：黒と紺、白地に黄色の文字</li>
+            <li>加齢は誰にでも起こるため、高齢社会においてUDの重要性は増す</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://shikisaikentei-online.com/uc-kanso" target="_blank">色彩検定UC級受験記（難易度・勉強法）</a>　／　<a href="https://note.com/y_design21/n/n0ef5dbd8cc96" target="_blank">合格者まとめ帳（note）</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ch.6 -->
+<div class="chapter" id="ch6">
+  <div class="chapter-head">
+    <span class="chapter-num">Ch.6</span>
+    <span class="chapter-title">見分けにくい色と配色の改善</span>
+  </div>
+
+  <!-- Q9 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q9</span>
+      <span class="q-text">P型・D型が見分けにくい色の組み合わせは？（混同色）</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">赤と緑、ピンクと水色、赤と茶、オレンジと黄緑などが代表的な混同色。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>赤と緑：最も代表的な混同色。特にD型（2型）に多い</li>
+            <li>ピンクと水色：試験公式例題にも登場（→紫みのピンクにすると区別しやすくなる）</li>
+            <li>赤と茶、オレンジと黄緑も混同しやすい</li>
+            <li>赤が暗く・くすんだ色に見えることがある</li>
+            <li>日常の例：肉の焼き加減がわからない／充電ランプの色変化に気づかない</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://www.aft.or.jp/pages/feature/examUc" target="_blank">色彩検定協会公式｜UC級出題例（問題1）</a>　／　<a href="https://note.com/y_design21/n/n0ef5dbd8cc96" target="_blank">合格者まとめ帳（note）</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q10</span>
+      <span class="q-text">配色を識別しやすくする主な改善方法は？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">明度差を大きくすることが最も基本的な手法。加えて、色以外の情報（形・文字・模様）を組み合わせる。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>明度差を大きくする：最も効果的。低彩度の色同士の組み合わせは避ける</li>
+            <li>アウトライン（縁取り）を加える：背景と図の境界線をつけることで識別性が上がる</li>
+            <li>文字・数字を加える：グラフの凡例に色だけを使わず、ラベルや数値も付記する</li>
+            <li>模様・形を使う：折れ線グラフのマーカー形状、地図の塗り分けパターンなど</li>
+            <li>色名を書き添える：マーカーペンなどに色名を記載することで伝達が確実に</li>
+            <li>セパレーション：色と色の間に白・黒・グレーを挟んで区別しやすくする</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://www.aft.or.jp/pages/feature/examUc" target="_blank">色彩検定協会公式｜UC級出題例</a>　／　<a href="https://shikaku-dojo.lb-product.com/shikisai-uc/articles/faq" target="_blank">資格道場｜見分けにくい色と配色の工夫</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q11</span>
+      <span class="q-text">黒板でのチョークの色と改善策は？（公式出題例より）</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">黒板で強調したい箇所に赤いチョークを使うことは避け、アンダーラインや囲みを加えることで対応する。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>赤いチョーク：P型・D型には黒板の緑と同化して見えにくい（重要頻出！）</li>
+            <li>改善策：アンダーラインを引く、四角く囲む、文字を大きくするなど</li>
+            <li>白いチョーク＋形の工夫が多くの人に対応できる</li>
+            <li>公式出題例の選択肢に「赤いチョークを使わない」という答えが正解として出題済み</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://www.aft.or.jp/pages/feature/examUc" target="_blank">色彩検定協会公式｜UC級出題例（問題1・F欄）</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ch.7 -->
+<div class="chapter" id="ch7">
+  <div class="chapter-head">
+    <span class="chapter-num">Ch.7</span>
+    <span class="chapter-title">色のUDの進め方</span>
+  </div>
+
+  <!-- Q12 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q12</span>
+      <span class="q-text">色のUDを進める際のステップは？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">①多くの人が区別しやすい色を使う → ②色以外の手がかりを加える → ③有効性をチェックする → ④必要に応じ修正→完成。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>①色を選ぶ：明度差を確保、混同しやすい色系統の組み合わせを避ける</li>
+            <li>②色以外の情報を加える：文字・形・模様・アンダーラインなど</li>
+            <li>③有効性チェック：シミュレーションソフト、画像の白黒化、当事者に確認</li>
+            <li>主なシミュレーションツール：Chromatic Vision Simulator、Adobe製品の機能など</li>
+            <li>④修正・完成：問題点があれば修正し、完成へ</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://note.com/y_design21/n/n0ef5dbd8cc96" target="_blank">合格者まとめ帳（note）｜UDの進め方</a>　／　<a href="https://note.com/aoyagiayako/n/nbf1ab002b8fe" target="_blank">認定講師による勉強の進め方（note）</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q13</span>
+      <span class="q-text">色コミュニケーションを助けるための工夫とは？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">色名を付記することで、色覚特性の異なる人同士でも円滑な色のコミュニケーションが可能になる。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>カラーマーカーなどに「色名」を記載する → 多様な色覚の人がともに使える</li>
+            <li>「色名」の付記が「色コミュニケーション」を促進（試験頻出ワード）</li>
+            <li>公式出題例：G欄「色名」、H欄「コミュニケーション」が正解</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://www.aft.or.jp/pages/feature/examUc" target="_blank">色彩検定協会公式｜UC級出題例（問題1・G/H欄）</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q14</span>
+      <span class="q-text">試験の形式と合格ラインは？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">試験時間60分・77〜78問前後（四択＋一部記述）。満点の約70%（140点/200点）以上が合格の目安。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>大問1〜9：4択マークシート形式</li>
+            <li>大問10：記述式（漢字・用語を書く）</li>
+            <li>合格ライン：満点の70%前後（難易度により変動）。160点前後が目安とされる</li>
+            <li>合格率：例年80%以上（2023年度：83.6%）</li>
+            <li>問題用紙は持ち帰り可。約1週間後に公式サイトで模範解答が発表される</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://qiita.com/Eto0/items/2a29e2aaf95a707c57dd" target="_blank">Qiita｜UC級受験記（2025冬・試験概要）</a>　／　<a href="https://note.com/aoyagiayako/n/nbf1ab002b8fe" target="_blank">認定講師｜勉強の進め方（合格率）</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== 深掘り問題セクション ===================== -->
+
+<!-- 深掘り1：用語・穴埋め系 -->
+<div class="chapter" id="ex1">
+  <div class="chapter-head">
+    <span class="chapter-num" style="background:#6A5ACD;">深掘り1</span>
+    <span class="chapter-title" style="color:#6A5ACD;">用語の定義・穴埋め系</span>
+  </div>
+
+  <!-- QA15 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q15</span>
+      <span class="q-text">「混同色線」とは何か？（記述・穴埋め頻出）</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">色度図上に、色覚特性ごとに区別しにくい色の組み合わせを表示し、それらを直線で結んだもの。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>P型・D型が混同しやすい色は、色度図上でほぼ一直線に並ぶ</li>
+            <li>その直線を「混同色線（こんどうしょくせん）」と呼ぶ</li>
+            <li>選択肢に「ガンマ線」「エックス線」「無彩色軸」「混同色線」が並ぶ形で出題された実績あり</li>
+            <li>無彩色軸はマンセル表色系の色立体の中心軸（黒〜白）のこと。混同色線とは別物</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://hinemosunotari-sikaku.com/qualification/color/uc_lesson_practice_2" target="_blank">UC級演習問題❷（2018冬期 公式メルマガ掲載）</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q16 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q16</span>
+      <span class="q-text">「1色覚」とは何か？P型・D型との違いは？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">1色覚は錐体が1種類しか働かない（または杆体のみ）色覚で、色みの区別がまったくできない。極めてまれ。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>1色覚（全色盲）：明るさは認識できるが、色を区別することはできない</li>
+            <li>割合：日本人男性の0.001%と極めてまれ</li>
+            <li>P型（1型）・D型（2型）は「色みの区別が困難」だが、1色覚ではない</li>
+            <li>試験では「色みの区別がまったくできない＝1色覚」という組み合わせで穴埋め出題あり</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://hinemosunotari-sikaku.com/qualification/color/uc_lesson_practice_2" target="_blank">UC級演習問題❷（2018冬期 公式メルマガ掲載）</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q17 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q17</span>
+      <span class="q-text">「ロービジョン」の定義は？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">病気やケガにより、眼鏡・コンタクトを使ってもよく見えない視力の低下や視野の欠損があり、生活に支障をきたす状態。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>原因：緑内障・糖尿病網膜症・遺伝性の網膜色素変性症・加齢黄斑変性症など</li>
+            <li>色覚異常（P型・D型）とは異なる概念。視力・視野の問題</li>
+            <li>ロービジョンの人は青と黒、緑のピクトグラムが見分けにくい場合がある</li>
+            <li>2018年に非常時避難ピクトグラムの緑色が黄みに変更されたのはこの配慮のため</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://www.aft.or.jp/uc/" target="_blank">色彩検定協会公式｜UC級とは（ロービジョン定義）</a>　／　<a href="https://note.com/y_design21/n/n0ef5dbd8cc96" target="_blank">合格者まとめ帳（note）</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q18 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q18</span>
+      <span class="q-text">「ヒュー・アンド・トーンシステム」とは？PCCSとの関係は？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">色を「色相（Hue）」と「トーン（Tone）」の2軸で分類するシステム。PCCSはこれを採用した日本の配色体系。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>PCCS（日本色研配色体系）は1964年に日本色彩研究所が開発</li>
+            <li>色相：24色相で構成。番号と記号で表す（例：2:R＝赤）</li>
+            <li>トーン：明度と彩度を組み合わせた概念。12種類（有彩色10＋無彩色系2）</li>
+            <li>有彩色の表記例：v2（ビビッドの2番色相）のように「トーン記号＋色相番号」で表す</li>
+            <li>マンセル表色系とは異なり、トーンはPCCS独自の概念</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://note.com/y_design21/n/n0ef5dbd8cc96" target="_blank">合格者まとめ帳（note）｜PCCS・色立体の定義</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q19 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q19</span>
+      <span class="q-text">「色立体」とは何か？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">色相・明度・彩度の三属性の関係を三次元的に表したもの。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>中心の縦軸：無彩色軸（黒から白）</li>
+            <li>外側に向かうほど彩度が高くなる</li>
+            <li>色相ごとに純色の明度が異なるため、立体の形は色相によって非対称</li>
+            <li>マンセル表色系にも色立体の概念あり（マンセルの木、Munsell Tree）</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://note.com/y_design21/n/n0ef5dbd8cc96" target="_blank">合格者まとめ帳（note）｜色立体の定義</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q20 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q20</span>
+      <span class="q-text">色の見え方が「反対色への分類」されるとはどういうことか？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">眼から入ったL・M・S錐体の情報が脳内で「赤または緑」「青または黄」の2対の反対色に変換・分類されること。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>色を感じる3段階：①錐体で光を受容 → ②反対色（赤/緑・青/黄）に分類 → ③色相・明度・彩度として分析</li>
+            <li>P型・D型はこの②の段階で「赤/緑」軸の信号が弱い・欠如している</li>
+            <li>T型は「青/黄」軸に問題がある</li>
+            <li>試験では色が見えるプロセスの「順番」を問う穴埋め問題が出ることがある</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://note.com/y_design21/n/n0ef5dbd8cc96" target="_blank">合格者まとめ帳（note）｜反対色への分類プロセス</a>　／　<a href="https://iret.media/123361" target="_blank">iret.media｜色覚タイプによる見え方</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 深掘り2：数値・データ系 -->
+<div class="chapter" id="ex2">
+  <div class="chapter-head">
+    <span class="chapter-num" style="background:#2A8A5A;">深掘り2</span>
+    <span class="chapter-title" style="color:#2A8A5A;">数値・データを問う系</span>
+  </div>
+
+  <!-- Q21 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q21</span>
+      <span class="q-text">P型・D型それぞれの日本人男性における割合は？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">P型（1型）は男性の約1.5%、D型（2型）は男性の約3.5%。合わせて約5%（20人に1人）。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>P型（1型色覚）：日本人男性の約1.5%</li>
+            <li>D型（2型色覚）：日本人男性の約3.5%（最も多いタイプ）</li>
+            <li>T型（3型色覚）：男性の約0.001%と極めてまれ</li>
+            <li>1色覚（全色盲）：男性の約0.001%と極めてまれ</li>
+            <li>女性全体：P型+D型合わせて約0.2%（約500人に1人）</li>
+            <li>国内の該当者：男女合わせて約300万人、世界では約2億人</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://hinemosunotari-sikaku.com/qualification/color/uc_lesson_practice_2" target="_blank">UC級演習問題❷（各型の割合・解説）</a>　／　<a href="https://www.aft.or.jp/uc/" target="_blank">色彩検定協会公式｜UC級とは</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q22 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q22</span>
+      <span class="q-text">可視光線の波長の数値範囲は？赤・紫それぞれ何nmか？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">可視光線は約380〜780nm。赤が約780nm（最長）、紫が約380nm（最短）。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>赤（長波長）：約780nm</li>
+            <li>橙・黄・緑・青と徐々に短くなる</li>
+            <li>紫（短波長）：約380nm</li>
+            <li>可視光線より短い→紫外線、X線、ガンマ線</li>
+            <li>可視光線より長い→赤外線、電波</li>
+            <li>試験では「赤は何nmか」「最も波長が長い色は」という形で出題される</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://qiita.com/Eto0/items/2a29e2aaf95a707c57dd" target="_blank">Qiita｜UC級受験記（波長の数値はよく出る）</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q23 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q23</span>
+      <span class="q-text">人種による色覚多様性の割合の違いは？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">日本人男性は約5%、黒人男性は約4%、白人男性は約6〜8%と、人種によって割合が異なる。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>日本人男性：約5%（P型+D型合計）</li>
+            <li>黒人男性：約4%</li>
+            <li>白人男性：約6〜8%（最も高い）</li>
+            <li>「日本人だけに多い」ではなく、人種間で割合が異なることを理解する</li>
+            <li>試験では「最も割合が高い人種」「白人男性の割合」などが問われることがある</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://www.aft.or.jp/uc/" target="_blank">色彩検定協会公式｜UC級とは（人種別割合）</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q24 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q24</span>
+      <span class="q-text">PCCSの色相数・トーン数は何種類か？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">色相は24種類、トーンは17種類（有彩色12＋無彩色系5）。試験では「24色相・12トーン」がよく問われる。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>色相：24色相（心理4原色＝赤・黄・緑・青を基本に構成）</li>
+            <li>トーン（有彩色）：12種類（v, b, s, dp, lt, sf, d, dk, p, ltg, g, dkg）</li>
+            <li>トーン（無彩色系）：5種類（W, ltGy, mGy, dkGy, Bk）</li>
+            <li>合計17トーン。試験では「有彩色のトーンは何種類か」という形でも出題される</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://note.com/y_design21/n/n0ef5dbd8cc96" target="_blank">合格者まとめ帳（note）｜PCCS定義</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 深掘り3：事例・場面系 -->
+<div class="chapter" id="ex3">
+  <div class="chapter-head">
+    <span class="chapter-num" style="background:#C85A2A;">深掘り3</span>
+    <span class="chapter-title" style="color:#C85A2A;">具体的な事例・場面から考える系</span>
+  </div>
+
+  <!-- Q25 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q25</span>
+      <span class="q-text">電光掲示板の赤文字が見えにくい人がいる理由と改善策は？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">P型（1型色覚）は赤が暗く見えるため、黒い電光掲示板上の赤文字が背景と同化して見えにくい。オレンジ寄りに変更・白くすることで改善できる。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>P型（1型）のみの特性：赤が暗く見える（D型よりも顕著）</li>
+            <li>黒背景＋赤文字→P型には「黒＋黒（暗い色）」のように見える</li>
+            <li>改善策：赤→オレンジ寄りに変更、または白文字に変更</li>
+            <li>カレンダーの日曜日表記も「赤→オレンジ寄り」への変更が進んでいる</li>
+            <li>試験では「1型色覚に特有の見え方」として出題されやすい</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://www.aft.or.jp/uc/" target="_blank">色彩検定協会公式｜UC級とは（電光掲示板の事例）</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q26 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q26</span>
+      <span class="q-text">避難誘導のピクトグラムの緑が見直された理由は？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">旧来の緑はP型・D型には灰色に見え、ロービジョンの人には青と見分けにくかったため、2018年に黄みの緑に改訂された。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>1型・2型色覚の人：従来の緑が「灰色」に感じられていた</li>
+            <li>ロービジョンの人：青と緑の区別が困難だった</li>
+            <li>2018年改訂：緑を黄みに寄せることで多くの人が認識しやすい色に変更</li>
+            <li>規格改正の実例として試験に出題される代表的な事例</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://www.aft.or.jp/uc/" target="_blank">色彩検定協会公式｜UC級とは（ピクトグラム改訂事例）</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q27 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q27</span>
+      <span class="q-text">折れ線グラフを色だけで区別している資料の、UCデザイン的な改善策は？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">線の形状（実線・破線・点線）やマーカーの形（〇・△・□など）を変える、凡例に色名・ラベルを付加するなど、色以外の情報を加える。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>線種を変える：実線・破線・点線・一点鎖線などで区別</li>
+            <li>マーカー形状を変える：●・▲・■・◆など異なる形状を使用</li>
+            <li>ラベルを直接付ける：凡例ではなくグラフ上に直接テキストを記入</li>
+            <li>明度差をつける：濃淡の差が大きい色の組み合わせにする</li>
+            <li>色だけに頼らないことが最大の原則</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://shikaku-dojo.lb-product.com/shikisai-uc/articles/faq" target="_blank">資格道場｜見分けにくい色と配色の工夫</a>　／　<a href="https://note.com/y_design21/n/n0ef5dbd8cc96" target="_blank">合格者まとめ帳（note）</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q28 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q28</span>
+      <span class="q-text">高齢者が「黒と紺が同じ色に見える」のはなぜか？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">加齢による水晶体の黄変とコントラスト感度の低下により、暗い色同士の明度差が識別しにくくなるため。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>水晶体が黄変→青〜紫の波長が吸収されやすくなる</li>
+            <li>黒と紺は本来明度が近いうえ、紺の青みが水晶体黄変でさらに識別しにくくなる</li>
+            <li>コントラスト感度の低下も重なり、暗色同士の区別がより困難に</li>
+            <li>同様に見えにくい例：白地に黄色の文字、黒と茶、紺と緑など</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://note.com/y_design21/n/n0ef5dbd8cc96" target="_blank">合格者まとめ帳（note）｜高齢者の見え方・事例</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q29 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q29</span>
+      <span class="q-text">「焦げ茶と深緑」が見分けにくい理由は？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">焦げ茶は赤を暗く・くすませたもの、深緑は緑を暗く・くすませたもの。赤と緑は混同色線上にあるため、明度・彩度を下げても同様に区別しにくい。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>赤と緑はP型・D型の混同色線上にある→同様に焦げ茶と深緑も区別しにくい</li>
+            <li>「赤と緑が見分けにくい」だけでなく、その低彩度・低明度バリエーションも同様</li>
+            <li>試験出題実績あり（2018年冬期 公式演習問題の選択肢に登場）</li>
+            <li>ピンクとグレーも同様の理由で区別しにくい（赤みのピンク＋無彩色の灰）</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://hinemosunotari-sikaku.com/qualification/color/uc_lesson_practice_2" target="_blank">UC級演習問題❷（2018冬期・C欄の解説）</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 深掘り4：記述式対策 -->
+<div class="chapter" id="ex4">
+  <div class="chapter-head">
+    <span class="chapter-num" style="background:#8B6914;">深掘り4</span>
+    <span class="chapter-title" style="color:#8B6914;">記述式対策（語句・漢字を正確に書く）</span>
+  </div>
+
+  <!-- Q30 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q30</span>
+      <span class="q-text">記述式で問われやすい重要語句は？（大問10対策）</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">漢字・カタカナ混じりの専門用語が正確に書けるかが問われる。特に「錐体」「杆体」「混同色線」「色覚特性」などは要注意。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>🖊 錐体（すいたい）※「推体」「椎体」は誤り</li>
+            <li>🖊 杆体（かんたい）※「桿体」も使われるが杆体が一般的</li>
+            <li>🖊 混同色線（こんどうしょくせん）</li>
+            <li>🖊 色覚特性（しきかくとくせい）※「色覚異常」「色覚障害」は現在使われない表現</li>
+            <li>🖊 カラーユニバーサルデザイン（CUD）</li>
+            <li>🖊 コントラスト感度（かんど）</li>
+            <li>🖊 ロービジョン</li>
+            <li>🖊 水晶体の黄変（おうへん）</li>
+            <li>🖊 セパレーション（分離配色）</li>
+            <li>🖊 UCアドバイザー（合格後に付与される資格名）</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ（書き取り練習はここで）</div>
+        <textarea class="note-field" style="min-height:100px;" placeholder="実際に書いて覚える練習ができます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://qiita.com/Eto0/items/2a29e2aaf95a707c57dd" target="_blank">Qiita｜UC級受験記（大問10・記述式の傾向）</a>　／　<a href="https://note.com/y_design21/n/n0ef5dbd8cc96" target="_blank">合格者まとめ帳（note）</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q31 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q31</span>
+      <span class="q-text">「色覚異常」という表現は試験で使っていいか？正しい表現は？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">試験・公式テキストでは「色覚の多様性」「色覚特性」「色覚タイプ」が使われる。「色覚異常」「色盲」は避けるべき古い表現。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>✅ 推奨表現：色覚の多様性 / 色覚特性 / 色覚タイプ / 1型・2型色覚</li>
+            <li>❌ 避ける表現：色覚異常 / 色盲 / 色弱（ただし医学的文脈では使われる場合もある）</li>
+            <li>UC級の理念は「多様性の尊重」であり、否定的なニュアンスの用語は使わない</li>
+            <li>記述式で「色覚異常」と書いても×にはならない可能性があるが、公式テキストの用語を使うのが無難</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://www.aft.or.jp/uc/" target="_blank">色彩検定協会公式｜UC級とは（用語の考え方）</a>　／　<a href="https://note.com/y_design21/n/n0ef5dbd8cc96" target="_blank">合格者まとめ帳（note）</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q32 -->
+  <div class="qa-card">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="q-badge">Q32</span>
+      <span class="q-text">UC級合格後に付与される資格の名称は？</span>
+      <span class="toggle-icon">▾</span>
+    </div>
+    <div class="qa-body">
+      <div class="answer-block">
+        <span class="a-badge">答え</span>
+        <div class="answer-summary">「UCアドバイザー」。合格者には色彩検定協会から資格カードが発行される。</div>
+        <div class="answer-detail">
+          <ul>
+            <li>名称：UCアドバイザー（UC Advisor）</li>
+            <li>合格後、申請すると名刺用の「UCアドバイザー資格マーク」のデータも入手可能</li>
+            <li>試験範囲ではないが、記述式問題で「この資格の合格者に与えられる称号は？」と出題された事例あり</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-label">自分のメモ</div>
+        <textarea class="note-field" placeholder="ここに自由にメモを書けます…"></textarea>
+      </div>
+      <div class="source-bar">
+        📎 Source: <a href="https://www.aft.or.jp/uc/" target="_blank">色彩検定協会公式｜UC級とは（UCアドバイザー）</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tip Box -->
+<div class="tip-box">
+  <h3>💡 試験対策のポイント（まとめ）</h3>
+  <ul>
+    <li>数値は確実に：P型1.5%・D型3.5%・合計5%（男性）、女性0.2%、白人男性6〜8%、世界約2億人</li>
+    <li>L/M/S錐体と色の対応（赤/緑/青）、波長の数値（赤780nm・紫380nm）をセットで覚える</li>
+    <li>「混同色線」「1色覚」「ロービジョン」など用語の定義が穴埋め・記述で頻出</li>
+    <li>「焦げ茶と深緑」「ピンクとグレー」「青と紫」も見分けにくい色として要チェック</li>
+    <li>事例問題：電光掲示板の赤文字／避難ピクトグラムの緑／黒板の赤チョークは必ず覚える</li>
+    <li>記述式では「色覚特性」「錐体（すいたい）」「混同色線」の漢字を正確に書けるよう練習</li>
+    <li>公式テキストの用語（色覚特性・UCアドバイザー等）を優先して使う</li>
+  </ul>
+</div>
+
+<footer>
+  色彩検定 UC級 頻出問題まとめ｜参考：色彩検定協会公式サイト・各受験者記録<br>
+  ※本資料は公式テキスト・公開情報をもとに作成しています。最新情報は <a href="https://www.aft.or.jp/uc/" target="_blank">色彩検定協会公式サイト</a> をご確認ください。<br><br>
+  <span style="font-size:11px; color:#aaa;">💾 メモはブラウザのlocalStorageに自動保存されます。同じブラウザ・同じファイルで開いた場合に引き継がれます。</span>
+</footer>
+
+<!-- 保存ステータストースト -->
+<div id="save-toast" style="
+  display:none;
+  position:fixed;
+  bottom:24px;
+  right:24px;
+  background:#3B6EA5;
+  color:#fff;
+  font-size:12px;
+  padding:8px 16px;
+  border-radius:20px;
+  box-shadow:0 2px 10px rgba(0,0,0,.18);
+  z-index:999;
+  transition:opacity .3s;
+">💾 メモを保存しました</div>
+
+<script>
+  /* ── アコーディオン ── */
+  function toggle(el) {
+    const card = el.closest('.qa-card');
+    card.classList.toggle('open');
+  }
+
+  /* ── localStorage キー生成（Q番号で識別） ── */
+  function storageKey(textarea) {
+    const card = textarea.closest('.qa-card');
+    const badge = card ? card.querySelector('.q-badge') : null;
+    return badge ? 'uc_note_' + badge.textContent.trim() : null;
+  }
+
+  /* ── 保存トースト ── */
+  let toastTimer;
+  function showToast() {
+    const t = document.getElementById('save-toast');
+    t.style.display = 'block';
+    t.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      t.style.opacity = '0';
+      setTimeout(() => t.style.display = 'none', 300);
+    }, 1800);
+  }
+
+  /* ── 全テキストエリアに保存・読み込みを設定 ── */
+  document.addEventListener('DOMContentLoaded', () => {
+    const areas = document.querySelectorAll('.note-field');
+
+    areas.forEach(area => {
+      const key = storageKey(area);
+      if (!key) return;
+
+      /* 保存済みメモを読み込む */
+      try {
+        const saved = localStorage.getItem(key);
+        if (saved) {
+          area.value = saved;
+          /* メモがある問題は自動で開く */
+          const card = area.closest('.qa-card');
+          if (card) card.classList.add('open');
+        }
+      } catch(e) {}
+
+      /* 入力のたびに自動保存（debounce 800ms） */
+      let saveTimer;
+      area.addEventListener('input', () => {
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => {
+          try {
+            if (area.value.trim()) {
+              localStorage.setItem(key, area.value);
+            } else {
+              localStorage.removeItem(key);
+            }
+            showToast();
+          } catch(e) {}
+        }, 800);
+      });
+    });
+  });
+</script>
+</body>
+</html>
