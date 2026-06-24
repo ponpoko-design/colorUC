@@ -1062,7 +1062,11 @@ function showDiagramModal(did) {
   const d = DIAGRAM_DATA[did];
   if (!d) return;
   document.getElementById('diagram-modal-title').textContent = d.title;
-  document.getElementById('diagram-modal-body').innerHTML = d.fn();
+  const body = document.getElementById('diagram-modal-body');
+  body.innerHTML = '';
+  const el = d.fn();
+  if (typeof el === 'string') { body.innerHTML = el; }
+  else { body.appendChild(el); }
   document.getElementById('diagram-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -1076,207 +1080,510 @@ function closeDiagramModalDirect() {
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeDiagramModalDirect(); });
 
 // ============================================================
-//  図のHTML生成関数群
+//  図のHTML生成関数群（インタラクティブ版）
 // ============================================================
+
+// ── 共通ユーティリティ ──
+function polar(cx, cy, angle, r) {
+  const rad = (angle - 90) * Math.PI / 180;
+  return [cx + r * Math.cos(rad), cy + r * Math.sin(rad)];
+}
+function svgEl(tag, attrs) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k, v));
+  return el;
+}
+function makeTooltip(container) {
+  const tip = document.createElement('div');
+  tip.style.cssText = 'position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;line-height:1.55;color:var(--text);pointer-events:none;display:none;z-index:999;box-shadow:0 2px 10px rgba(0,0,0,.12);max-width:200px;';
+  container.style.position = 'relative';
+  container.appendChild(tip);
+  return tip;
+}
+function showTip(tip, e, html) {
+  tip.innerHTML = html;
+  tip.style.display = 'block';
+  moveTip(tip, e);
+}
+function moveTip(tip, e) {
+  const rect = tip.parentElement.getBoundingClientRect();
+  let x = e.clientX - rect.left + 12;
+  let y = e.clientY - rect.top - 10;
+  if (x + 210 > rect.width) x = e.clientX - rect.left - 220;
+  tip.style.left = x + 'px';
+  tip.style.top  = y + 'px';
+}
+function hideTip(tip) { tip.style.display = 'none'; }
+
+// ── d01: PCCS色相環 ──
 function getDiagramPCSS() {
-  return `<div style="position:relative;display:flex;justify-content:center;">
-<svg id="wheel-d" width="100%" viewBox="0 0 420 420" style="max-width:380px;">
-${buildColorWheel()}
-</svg></div>
-<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:4px 10px;margin-top:8px;font-size:11px;color:#888;">
-${[{n:2,name:'赤(R)',h:5},{n:8,name:'黄(Y)',h:64},{n:12,name:'緑(G)',h:140},{n:18,name:'青(B)',h:210}].map(p=>`<span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:hsl(${p.h},88%,52%);display:inline-block;"></span>心理4原色 ${p.name}</span>`).join('')}
-</div>`;
-}
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px 0;';
+  const tip = makeTooltip(wrap);
 
-function buildColorWheel() {
-  const hues=[{h:345},{h:5},{h:18},{h:28},{h:38},{h:48},{h:57},{h:64},{h:75},{h:90},{h:105},{h:140},{h:158},{h:172},{h:185},{h:210},{h:225},{h:240},{h:255},{h:268},{h:280},{h:295},{h:315},{h:330}];
-  const labels=['pR','R','yR','rO','O','yO','rY','Y','gY','YG','yG','G','bG','BG','gB','B','B','pB','V','bP','P','rP','RP','pR'];
-  const names=['紫みの赤','赤','黄みの赤','赤みのオレンジ','オレンジ','黄みのオレンジ','赤みの黄','黄','緑みの黄','黄緑','黄みの緑','緑','青みの緑','青緑','緑みの青','青','青（深）','紫みの青','青紫','青みの紫','紫','赤みの紫','赤紫','紫みの赤（深）'];
-  const cx=210,cy=210,outerR=180,innerR=98,midR=139,sliceAngle=360/24;
-  const primary4=[2,8,12,18];
-  function polar(angle,r){const rad=(angle-90)*Math.PI/180;return[cx+r*Math.cos(rad),cy+r*Math.sin(rad)];}
-  function path(i){const a1=i*sliceAngle-sliceAngle/2,a2=a1+sliceAngle;const[ox1,oy1]=polar(a1,outerR);const[ox2,oy2]=polar(a2,outerR);const[ix1,iy1]=polar(a2,innerR);const[ix2,iy2]=polar(a1,innerR);return`M${ox1},${oy1} A${outerR},${outerR} 0 0,1 ${ox2},${oy2} L${ix1},${iy1} A${innerR},${innerR} 0 0,0 ${ix2},${iy2} Z`;}
-  let out='';
-  hues.forEach((hue,i)=>{
-    const angle=i*sliceAngle;
-    const color=`hsl(${hue.h},88%,52%)`;
-    const[lx,ly]=polar(angle,midR);
-    const[tlx,tly]=polar(angle,outerR+14);
-    out+=`<path d="${path(i+1)}" fill="${color}" stroke="white" stroke-width="1.2"/>`;
-    out+=`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="central" font-size="10" font-weight="500" fill="white" font-family="Meiryo UI,sans-serif">${i+1}</text>`;
-    out+=`<text x="${tlx}" y="${tly}" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#888" font-family="Meiryo UI,sans-serif">${labels[i]}</text>`;
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const size = Math.min(360, window.innerWidth - 48);
+  const cx = size/2, cy = size/2;
+  const outerR = size*0.43, innerR = size*0.24, midR = (outerR+innerR)/2;
+  const sliceAngle = 360/24;
+
+  const hues = [
+    {n:1,  label:'pR', name:'紫みの赤',       h:345},
+    {n:2,  label:'R',  name:'赤（心理4原色）', h:5,   primary:true},
+    {n:3,  label:'yR', name:'黄みの赤',       h:18},
+    {n:4,  label:'rO', name:'赤みのオレンジ', h:28},
+    {n:5,  label:'O',  name:'オレンジ',       h:38},
+    {n:6,  label:'yO', name:'黄みのオレンジ', h:48},
+    {n:7,  label:'rY', name:'赤みの黄',       h:57},
+    {n:8,  label:'Y',  name:'黄（心理4原色）', h:64,  primary:true},
+    {n:9,  label:'gY', name:'緑みの黄',       h:75},
+    {n:10, label:'YG', name:'黄緑',           h:90},
+    {n:11, label:'yG', name:'黄みの緑',       h:105},
+    {n:12, label:'G',  name:'緑（心理4原色）', h:140, primary:true},
+    {n:13, label:'bG', name:'青みの緑',       h:158},
+    {n:14, label:'BG', name:'青緑',           h:172},
+    {n:15, label:'gB', name:'緑みの青',       h:185},
+    {n:16, label:'B',  name:'青',             h:210},
+    {n:17, label:'B',  name:'青（深）',        h:225},
+    {n:18, label:'pB', name:'青（心理4原色）', h:240, primary:true},
+    {n:19, label:'V',  name:'青紫',           h:255},
+    {n:20, label:'bP', name:'青みの紫',       h:268},
+    {n:21, label:'P',  name:'紫',             h:280},
+    {n:22, label:'rP', name:'赤みの紫',       h:295},
+    {n:23, label:'RP', name:'赤紫',           h:315},
+    {n:24, label:'pR', name:'紫みの赤（深）', h:330},
+  ];
+
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('width', '100%');
+  svg.setAttribute('viewBox', `0 0 ${size} ${size}`);
+  svg.style.cssText = 'display:block;max-width:360px;';
+
+  hues.forEach((hue, i) => {
+    const angle = i * sliceAngle;
+    const a1 = angle - sliceAngle/2, a2 = angle + sliceAngle/2;
+    const [ox1,oy1] = polar(cx,cy,a1,outerR);
+    const [ox2,oy2] = polar(cx,cy,a2,outerR);
+    const [ix1,iy1] = polar(cx,cy,a2,innerR);
+    const [ix2,iy2] = polar(cx,cy,a1,innerR);
+    const pathD = `M${ox1},${oy1} A${outerR},${outerR} 0 0,1 ${ox2},${oy2} L${ix1},${iy1} A${innerR},${innerR} 0 0,0 ${ix2},${iy2} Z`;
+
+    const g = svgEl('g', {cursor:'pointer'});
+    const path = svgEl('path', {d:pathD, fill:`hsl(${hue.h},88%,52%)`, stroke:'white', 'stroke-width':'1.5'});
+    g.appendChild(path);
+
+    // 番号
+    const [lx,ly] = polar(cx,cy,angle,midR);
+    const num = svgEl('text', {x:lx, y:ly, 'text-anchor':'middle', 'dominant-baseline':'central', 'font-size': Math.max(9, size*0.028), 'font-weight':'500', fill:'white', 'font-family':'Meiryo UI,sans-serif'});
+    num.textContent = hue.n;
+    g.appendChild(num);
+
+    // 外側ラベル
+    const [tlx,tly] = polar(cx,cy,angle,outerR+size*0.045);
+    const lbl = svgEl('text', {x:tlx, y:tly, 'text-anchor':'middle', 'dominant-baseline':'central', 'font-size': Math.max(8, size*0.022), fill:'#888', 'font-family':'Meiryo UI,sans-serif'});
+    lbl.textContent = hue.label;
+    svg.appendChild(lbl);
+
+    // 心理4原色マーカー
+    if (hue.primary) {
+      const [px,py] = polar(cx,cy,angle,outerR+size*0.02);
+      const dot = svgEl('circle', {cx:px, cy:py, r:3.5, fill:'#333', opacity:'0.5'});
+      svg.appendChild(dot);
+    }
+
+    // ホバー
+    g.addEventListener('mouseenter', e => {
+      path.setAttribute('stroke-width','3');
+      showTip(tip, e, `<strong>${hue.n}：${hue.name}</strong><br>記号：${hue.label}<br>色相角：約${hue.h}°`);
+    });
+    g.addEventListener('mousemove', e => moveTip(tip, e));
+    g.addEventListener('mouseleave', () => { path.setAttribute('stroke-width','1.5'); hideTip(tip); });
+    // タップ対応
+    g.addEventListener('click', e => {
+      if (tip.style.display === 'none') {
+        showTip(tip, e, `<strong>${hue.n}：${hue.name}</strong><br>記号：${hue.label}<br>色相角：約${hue.h}°`);
+      } else { hideTip(tip); }
+    });
+
+    svg.appendChild(g);
   });
-  primary4.forEach(n=>{const[px,py]=polar((n-1)*sliceAngle,outerR+5);out+=`<circle cx="${px}" cy="${py}" r="3.5" fill="#333" opacity="0.5"/>`;});
-  out+=`<circle cx="${cx}" cy="${cy}" r="${innerR-3}" fill="var(--bg)" stroke="var(--border)" stroke-width="0.5"/>`;
-  out+=`<text x="${cx}" y="${cy-10}" text-anchor="middle" font-size="13" font-weight="500" fill="var(--text)" font-family="Meiryo UI,sans-serif">PCCS</text>`;
-  out+=`<text x="${cx}" y="${cy+8}" text-anchor="middle" font-size="10" fill="#888" font-family="Meiryo UI,sans-serif">24色相環</text>`;
-  out+=`<text x="${cx}" y="${cy+24}" text-anchor="middle" font-size="9" fill="#aaa" font-family="Meiryo UI,sans-serif">●＝心理4原色</text>`;
-  return out;
+
+  // 中央
+  const cbg = svgEl('circle', {cx, cy, r:innerR-3, fill:'var(--surface)', stroke:'var(--border)', 'stroke-width':'0.5'});
+  svg.appendChild(cbg);
+  const ct1 = svgEl('text', {x:cx, y:cy-10, 'text-anchor':'middle', 'dominant-baseline':'central', 'font-size':size*0.038, 'font-weight':'500', fill:'var(--text)', 'font-family':'Meiryo UI,sans-serif'});
+  ct1.textContent = 'PCCS';
+  svg.appendChild(ct1);
+  const ct2 = svgEl('text', {x:cx, y:cy+8, 'text-anchor':'middle', 'dominant-baseline':'central', 'font-size':size*0.027, fill:'#888', 'font-family':'Meiryo UI,sans-serif'});
+  ct2.textContent = '24色相環';
+  svg.appendChild(ct2);
+  const ct3 = svgEl('text', {x:cx, y:cy+22, 'text-anchor':'middle', 'dominant-baseline':'central', 'font-size':size*0.024, fill:'#aaa', 'font-family':'Meiryo UI,sans-serif'});
+  ct3.textContent = '●＝心理4原色';
+  svg.appendChild(ct3);
+
+  wrap.appendChild(svg);
+
+  // 凡例
+  const legend = document.createElement('div');
+  legend.style.cssText = 'display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;font-size:11px;color:#888;';
+  [{n:2,h:5,name:'赤(R)'},{n:8,h:64,name:'黄(Y)'},{n:12,h:140,name:'緑(G)'},{n:18,h:210,name:'青(B)'}].forEach(p => {
+    legend.innerHTML += `<span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:hsl(${p.h},88%,52%);display:inline-block;"></span>心理4原色 ${p.name}</span>`;
+  });
+  wrap.appendChild(legend);
+  return wrap;
 }
 
+// ── d02: トーンマップ ──
 function getDiagramTone() {
-  const tones=[
-    {abbr:'p',   name:'ペール',       bg:'hsl(220,55%,88%)',tc:'#2a4a7a',row:0,col:0,desc:'淡い・明るい'},
-    {abbr:'lt',  name:'ライト',       bg:'hsl(220,75%,75%)',tc:'#1a3a6a',row:0,col:1,desc:'明るい・爽やか'},
-    {abbr:'b',   name:'ブライト',     bg:'hsl(220,90%,62%)',tc:'#fff',   row:0,col:2,desc:'明るく鮮やか'},
-    {abbr:'ltg', name:'ライトG',      bg:'hsl(220,20%,72%)',tc:'#2a3a5a',row:1,col:0,desc:'明るいグレイッシュ'},
-    {abbr:'sf',  name:'ソフト',       bg:'hsl(220,45%,60%)',tc:'#fff',   row:1,col:1,desc:'柔らかい・穏やか'},
-    {abbr:'v',   name:'ビビッド',     bg:'hsl(220,100%,45%)',tc:'#fff',  row:1,col:2,desc:'純色に最も近い'},
-    {abbr:'s',   name:'ストロング',   bg:'hsl(220,80%,50%)',tc:'#fff',   row:1,col:2,desc:'強い・はっきり',sub:true},
-    {abbr:'g',   name:'グレイッシュ', bg:'hsl(220,15%,52%)',tc:'#fff',   row:2,col:0,desc:'くすんだ・灰み'},
-    {abbr:'d',   name:'ダル',         bg:'hsl(220,35%,42%)',tc:'#fff',   row:2,col:1,desc:'鈍い・渋い'},
-    {abbr:'dp',  name:'ディープ',     bg:'hsl(220,75%,32%)',tc:'#fff',   row:2,col:2,desc:'深い・濃い'},
-    {abbr:'dkg', name:'ダークG',      bg:'hsl(220,12%,34%)',tc:'#fff',   row:3,col:0,desc:'暗いグレイッシュ'},
-    {abbr:'dk',  name:'ダーク',       bg:'hsl(220,60%,22%)',tc:'#fff',   row:3,col:2,desc:'暗い・重厚'},
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'padding:8px 0;';
+  const tip = makeTooltip(wrap);
+
+  const tones = [
+    {abbr:'p',   name:'ペール',           bg:'hsl(220,55%,88%)', tc:'#2a4a7a', row:0,col:0, desc:'淡い・明るい・軽やかな印象'},
+    {abbr:'lt',  name:'ライト',           bg:'hsl(220,75%,75%)', tc:'#1a3a6a', row:0,col:1, desc:'明るい・爽やかな印象'},
+    {abbr:'b',   name:'ブライト',         bg:'hsl(220,90%,62%)', tc:'#fff',    row:0,col:2, desc:'明るく鮮やかな・さわやかな印象'},
+    {abbr:'ltg', name:'ライトグレイッシュ', bg:'hsl(220,20%,72%)', tc:'#2a3a5a', row:1,col:0, desc:'明るいグレイッシュ・柔らかい印象'},
+    {abbr:'sf',  name:'ソフト',           bg:'hsl(220,45%,60%)', tc:'#fff',    row:1,col:1, desc:'柔らかい・穏やかな印象'},
+    {abbr:'v',   name:'ビビッド',         bg:'hsl(220,100%,45%)',tc:'#fff',    row:1,col:2, desc:'純色に最も近い・最も鮮やかなトーン'},
+    {abbr:'s',   name:'ストロング',       bg:'hsl(220,80%,50%)', tc:'#fff',    row:1,col:2, desc:'強い・はっきりした印象', sub:true},
+    {abbr:'g',   name:'グレイッシュ',     bg:'hsl(220,15%,52%)', tc:'#fff',    row:2,col:0, desc:'灰みがかった・くすんだ印象'},
+    {abbr:'d',   name:'ダル',             bg:'hsl(220,35%,42%)', tc:'#fff',    row:2,col:1, desc:'鈍い・くすんだ・渋い印象'},
+    {abbr:'dp',  name:'ディープ',         bg:'hsl(220,75%,32%)', tc:'#fff',    row:2,col:2, desc:'深い・濃い・重厚な印象'},
+    {abbr:'dkg', name:'ダークグレイッシュ', bg:'hsl(220,12%,34%)', tc:'#fff',  row:3,col:0, desc:'暗いグレイッシュ・重い印象'},
+    {abbr:'dk',  name:'ダーク',           bg:'hsl(220,60%,22%)', tc:'#fff',    row:3,col:2, desc:'暗い・重厚な・男性的な印象'},
   ];
-  const ach=[
-    {abbr:'W',   name:'ホワイト', bg:'#f0f0f0',tc:'#333'},
-    {abbr:'ltGy',name:'ライトG',  bg:'#c0c0c0',tc:'#333'},
-    {abbr:'mGy', name:'ミッドG',  bg:'#888',   tc:'#fff'},
-    {abbr:'dkGy',name:'ダークG',  bg:'#444',   tc:'#fff'},
-    {abbr:'Bk',  name:'ブラック', bg:'#1a1a1a',tc:'#fff'},
+  const achromatic = [
+    {abbr:'W',    name:'ホワイト',       bg:'#f5f5f5', tc:'#333', desc:'白。最高明度'},
+    {abbr:'ltGy', name:'ライトグレー',   bg:'#c8c8c8', tc:'#333', desc:'明るいグレー'},
+    {abbr:'mGy',  name:'ミディアムグレー', bg:'#888',  tc:'#fff', desc:'中明度のグレー'},
+    {abbr:'dkGy', name:'ダークグレー',   bg:'#444',   tc:'#fff', desc:'暗いグレー'},
+    {abbr:'Bk',   name:'ブラック',       bg:'#1a1a1a', tc:'#fff', desc:'黒。最低明度'},
   ];
-  const cw=80,ch=44,gap=8,achW=64;
-  const rowH=ch+gap;
-  const cols3=tones.filter(t=>!t.sub);
-  // SVGで描画
-  let out=`<svg width="100%" viewBox="0 0 520 240" style="display:block;max-width:100%;height:auto;overflow:hidden;margin:0 auto;">`;
-  // 軸ラベル
-  out+=`<text x="260" y="12" text-anchor="middle" font-size="10" fill="#aaa" font-family="Meiryo UI,sans-serif">← 低彩度　高彩度 →</text>`;
-  out+=`<text x="8" y="120" text-anchor="middle" font-size="10" fill="#aaa" transform="rotate(-90,8,120)" font-family="Meiryo UI,sans-serif">明度↑</text>`;
-  // グリッド描画
-  const gridX=20, gridY=22;
-  [0,1,2,3].forEach(row=>{
-    [0,1,2].forEach(col=>{
-      const t=tones.find(x=>x.row===row&&x.col===col&&!x.sub);
-      const t2=tones.find(x=>x.row===row&&x.col===col&&x.sub);
-      const x=gridX+col*(cw+gap), y=gridY+row*rowH;
-      if(t){
-        out+=`<rect x="${x}" y="${y}" width="${cw}" height="${t2?20:ch}" rx="6" fill="${t.bg}" stroke="rgba(255,255,255,.3)" stroke-width="0.5"/>`;
-        out+=`<text x="${x+cw/2}" y="${y+(t2?10:ch/2)}" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="700" fill="${t.tc}" font-family="Meiryo UI,sans-serif">${t.abbr}</text>`;
-        if(t2){
-          out+=`<rect x="${x}" y="${y+22}" width="${cw}" height="20" rx="6" fill="${t2.bg}" stroke="rgba(255,255,255,.3)" stroke-width="0.5"/>`;
-          out+=`<text x="${x+cw/2}" y="${y+32}" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="700" fill="${t2.tc}" font-family="Meiryo UI,sans-serif">${t2.abbr}</text>`;
-        }
+
+  // ヘッダーラベル
+  const hdr = document.createElement('div');
+  hdr.style.cssText = 'display:flex;justify-content:space-between;padding:0 44px 0 44px;margin-bottom:4px;font-size:11px;color:#aaa;';
+  hdr.innerHTML = '<span>← 低彩度</span><span>高彩度 →</span>';
+  wrap.appendChild(hdr);
+
+  const grid = document.createElement('div');
+  grid.style.cssText = 'display:grid;grid-template-columns:28px 1fr auto;gap:0;align-items:stretch;';
+
+  // 縦軸ラベル
+  const yAxis = document.createElement('div');
+  yAxis.style.cssText = 'display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:4px 0;font-size:10px;color:#aaa;writing-mode:vertical-rl;text-align:center;';
+  yAxis.innerHTML = '<span>高明度</span><span>低明度</span>';
+  grid.appendChild(yAxis);
+
+  // メイングリッド
+  const mainGrid = document.createElement('div');
+  mainGrid.style.cssText = 'display:grid;grid-template-rows:repeat(4,1fr);gap:6px;';
+
+  [0,1,2,3].forEach(row => {
+    const rowDiv = document.createElement('div');
+    rowDiv.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:6px;';
+    [0,1,2].forEach(col => {
+      const cellTones = tones.filter(t => t.row===row && t.col===col);
+      const cellDiv = document.createElement('div');
+      cellDiv.style.cssText = 'display:flex;flex-direction:column;gap:3px;';
+      if (cellTones.length === 0) {
+        const empty = document.createElement('div');
+        empty.style.cssText = 'flex:1;background:var(--bg);border-radius:6px;min-height:44px;opacity:.3;';
+        cellDiv.appendChild(empty);
       } else {
-        out+=`<rect x="${x}" y="${y}" width="${cw}" height="${ch}" rx="6" fill="#eee" opacity=".3"/>`;
+        cellTones.forEach(t => {
+          const btn = document.createElement('div');
+          btn.style.cssText = `background:${t.bg};color:${t.tc};border-radius:6px;padding:8px 6px;text-align:center;cursor:pointer;transition:transform .12s;min-height:${cellTones.length>1?'36px':'52px'};display:flex;flex-direction:column;justify-content:center;`;
+          btn.innerHTML = `<div style="font-size:13px;font-weight:700;">${t.abbr}</div><div style="font-size:10px;opacity:.85;">${t.name}</div>`;
+          btn.addEventListener('mouseenter', e => { btn.style.transform='scale(1.06)'; showTip(tip, e, `<strong>${t.abbr}（${t.name}）</strong><br>${t.desc}`); });
+          btn.addEventListener('mousemove', e => moveTip(tip, e));
+          btn.addEventListener('mouseleave', () => { btn.style.transform=''; hideTip(tip); });
+          btn.addEventListener('click', e => { if(tip.style.display==='none'){showTip(tip,e,`<strong>${t.abbr}（${t.name}）</strong><br>${t.desc}`);}else{hideTip(tip);} });
+          cellDiv.appendChild(btn);
+        });
       }
+      rowDiv.appendChild(cellDiv);
+    });
+    mainGrid.appendChild(rowDiv);
+  });
+  grid.appendChild(mainGrid);
+
+  // 無彩色列
+  const achCol = document.createElement('div');
+  achCol.style.cssText = 'display:flex;flex-direction:column;gap:6px;padding-left:8px;min-width:60px;';
+  const achLabel = document.createElement('div');
+  achLabel.style.cssText = 'font-size:10px;color:#aaa;text-align:center;margin-bottom:2px;';
+  achLabel.textContent = '無彩色';
+  achCol.appendChild(achLabel);
+  achromatic.forEach(a => {
+    const btn = document.createElement('div');
+    btn.style.cssText = `background:${a.bg};color:${a.tc};border-radius:6px;padding:5px 6px;text-align:center;cursor:pointer;transition:transform .12s;flex:1;display:flex;flex-direction:column;justify-content:center;`;
+    btn.innerHTML = `<div style="font-size:11px;font-weight:700;">${a.abbr}</div>`;
+    btn.addEventListener('mouseenter', e => { btn.style.transform='scale(1.06)'; showTip(tip, e, `<strong>${a.abbr}（${a.name}）</strong><br>${a.desc}`); });
+    btn.addEventListener('mousemove', e => moveTip(tip, e));
+    btn.addEventListener('mouseleave', () => { btn.style.transform=''; hideTip(tip); });
+    btn.addEventListener('click', e => { if(tip.style.display==='none'){showTip(tip,e,`<strong>${a.abbr}（${a.name}）</strong><br>${a.desc}`);}else{hideTip(tip);} });
+    achCol.appendChild(btn);
+  });
+  grid.appendChild(achCol);
+
+  wrap.appendChild(grid);
+  return wrap;
+}
+
+// ── d03: 色立体断面図 ──
+function getDiagramSolid() {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'padding:8px 0;';
+  const tip = makeTooltip(wrap);
+
+  wrap.innerHTML = `<svg width="100%" viewBox="0 0 560 340" style="display:block;max-width:100%;height:auto;">
+<defs>
+  <linearGradient id="axG2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f0f0f0"/><stop offset="100%" stop-color="#1a1a1a"/></linearGradient>
+  <linearGradient id="lG2" x1="1" y1="0" x2="0" y2="0"><stop offset="0%" stop-color="#888" stop-opacity="0"/><stop offset="100%" stop-color="#e05050"/></linearGradient>
+  <linearGradient id="rG2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#888" stop-opacity="0"/><stop offset="100%" stop-color="#4a90d9"/></linearGradient>
+</defs>
+<rect x="271" y="44" width="18" height="252" rx="4" fill="url(#axG2)" stroke="#ddd" stroke-width="0.5"/>
+<path d="M271,76 Q198,112 136,170 Q198,228 271,260 Z" fill="url(#lG2)" opacity="0.7"/>
+<path d="M271,76 Q198,112 136,170 Q198,228 271,260" fill="none" stroke="#e05050" stroke-width="1.5" stroke-dasharray="5 3"/>
+<path d="M289,76 Q362,112 424,170 Q362,228 289,260 Z" fill="url(#rG2)" opacity="0.7"/>
+<path d="M289,76 Q362,112 424,170 Q362,228 289,260" fill="none" stroke="#4a90d9" stroke-width="1.5" stroke-dasharray="5 3"/>
+<circle cx="136" cy="170" r="8" fill="#e05050" stroke="white" stroke-width="2" style="cursor:pointer"/>
+<circle cx="424" cy="170" r="8" fill="#4a90d9" stroke="white" stroke-width="2" style="cursor:pointer"/>
+<text x="100" y="155" text-anchor="middle" font-size="12" fill="#c04040" font-family="Meiryo UI,sans-serif" font-weight="500">純色（赤）</text>
+<text x="100" y="170" text-anchor="middle" font-size="10" fill="#aaa" font-family="Meiryo UI,sans-serif">v2</text>
+<text x="460" y="155" text-anchor="middle" font-size="12" fill="#2a70b9" font-family="Meiryo UI,sans-serif" font-weight="500">純色（青）</text>
+<text x="460" y="170" text-anchor="middle" font-size="10" fill="#aaa" font-family="Meiryo UI,sans-serif">v18</text>
+<text x="280" y="38" text-anchor="middle" font-size="11" fill="#888" font-family="Meiryo UI,sans-serif">白（W）</text>
+<text x="280" y="310" text-anchor="middle" font-size="11" fill="#888" font-family="Meiryo UI,sans-serif">黒（Bk）</text>
+<line x1="279" y1="170" x2="144" y2="170" stroke="#e05050" stroke-width="1" stroke-dasharray="3 3" opacity="0.5"/>
+<line x1="289" y1="170" x2="416" y2="170" stroke="#4a90d9" stroke-width="1" stroke-dasharray="3 3" opacity="0.5"/>
+<text x="207" y="160" text-anchor="middle" font-size="10" fill="#c04040" font-family="Meiryo UI,sans-serif">← 彩度高</text>
+<text x="353" y="160" text-anchor="middle" font-size="10" fill="#2a70b9" font-family="Meiryo UI,sans-serif">彩度高 →</text>
+<rect x="14" y="50" width="118" height="64" rx="6" fill="var(--surface)" stroke="var(--border)" stroke-width="0.5"/>
+<text x="73" y="70" text-anchor="middle" font-size="10" font-weight="500" fill="var(--text)" font-family="Meiryo UI,sans-serif">中心軸 = 無彩色</text>
+<text x="73" y="85" text-anchor="middle" font-size="10" fill="#888" font-family="Meiryo UI,sans-serif">（明度の軸）</text>
+<text x="73" y="100" text-anchor="middle" font-size="10" fill="#888" font-family="Meiryo UI,sans-serif">外側 = 高彩度</text>
+<text x="280" y="328" text-anchor="middle" font-size="10" fill="#aaa" font-family="Meiryo UI,sans-serif">※色相により純色の明度が異なるため非対称</text>
+</svg>`;
+
+  // ホバーできる注釈エリアをオーバーレイ
+  const points = [
+    {label:'無彩色軸', detail:'黒（最低明度）から白（最高明度）への軸。中心にあるほど彩度が低い（無彩色）。', px:'50%', py:'50%'},
+    {label:'純色（赤）v2', detail:'赤の純色はPCCSでv2と表記。彩度が最も高い位置（外側）にある。', px:'24%', py:'50%'},
+    {label:'純色（青）v18', detail:'青の純色はPCCSでv18と表記。赤と同じ明度ではなく、色相ごとに純色の明度が異なる。', px:'76%', py:'50%'},
+  ];
+
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:relative;margin-top:-20px;';
+  points.forEach(p => {
+    const hotspot = document.createElement('div');
+    hotspot.style.cssText = `position:absolute;left:${p.px};top:${p.py};transform:translate(-50%,-50%);width:40px;height:40px;cursor:help;`;
+    hotspot.addEventListener('mouseenter', e => showTip(tip, e, `<strong>${p.label}</strong><br>${p.detail}`));
+    hotspot.addEventListener('mousemove', e => moveTip(tip, e));
+    hotspot.addEventListener('mouseleave', () => hideTip(tip));
+    overlay.appendChild(hotspot);
+  });
+  wrap.appendChild(overlay);
+  return wrap;
+}
+
+// ── d04: 錐体感度曲線 ──
+function getDiagramCones() {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'padding:8px 0;';
+  const tip = makeTooltip(wrap);
+
+  // 各錐体：ピーク波長に対応したX座標と、曲線の頂点Y座標を個別に設定
+  // peakCy = 曲線の実際の頂点Y（パス上の最高点）
+  // labelY = ラベルのY座標（頂点より上に各自ずらす）
+  const cones = [
+    {
+      id:'S', label:'S錐体（青系）', sublabel:'T型異常', color:'#4466ff', peak:445,
+      desc:'短波長（青系）に最大感度。<br>S錐体の異常＝T型（3型色覚）',
+      peakCy:38, labelY:16,
+      pathD:'M50,194 Q90,192 118,184 Q136,148 140,102 Q143,52 150,38 Q157,26 164,44 Q172,66 188,140 Q212,180 270,191 Q380,196 510,195'
+    },
+    {
+      id:'M', label:'M錐体（緑系）', sublabel:'D型異常', color:'#339933', peak:535,
+      desc:'中波長（緑系）に最大感度。<br>M錐体の異常＝D型（2型色覚）',
+      peakCy:52, labelY:30,
+      pathD:'M50,195 Q100,193 160,187 Q210,177 255,156 Q278,130 284,94 Q290,56 297,52 Q304,48 312,56 Q326,74 352,136 Q395,180 450,191 Q490,195 510,195'
+    },
+    {
+      id:'L', label:'L錐体（赤系）', sublabel:'P型異常', color:'#cc2222', peak:565,
+      desc:'長波長（赤系）に最大感度。<br>L錐体の異常＝P型（1型色覚）',
+      peakCy:66, labelY:44,
+      pathD:'M50,195 Q150,193 230,189 Q275,181 320,167 Q362,146 385,118 Q405,92 418,66 Q430,44 440,66 Q450,88 465,138 Q485,178 510,193'
+    },
+  ];
+
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('width','100%');
+  svg.setAttribute('viewBox','0 0 560 270');
+  svg.style.cssText = 'display:block;max-width:100%;height:auto;';
+
+  // スペクトルバー
+  const defs = svgEl('defs',{});
+  const grad = svgEl('linearGradient',{id:'spG2',x1:'0',y1:'0',x2:'1',y2:'0'});
+  [['0%','#8800ff'],['14%','#3355ff'],['28%','#0088ff'],['42%','#00cccc'],['55%','#00cc00'],['68%','#aacc00'],['80%','#ffcc00'],['90%','#ff6600'],['100%','#cc0000']].forEach(([offset,color])=>{
+    const stop = svgEl('stop',{offset,'stop-color':color});
+    grad.appendChild(stop);
+  });
+  defs.appendChild(grad);
+  svg.appendChild(defs);
+
+  svg.appendChild(svgEl('rect',{x:'50',y:'200',width:'460',height:'12',rx:'3',fill:'url(#spG2)',opacity:'0.85'}));
+
+  // 波長軸ラベル
+  [[50,'380'],[167,'450'],[280,'550nm'],[397,'650'],[510,'780']].forEach(([x,t])=>{
+    const tx = svgEl('text',{x,y:'225','text-anchor':'middle','font-size':'9',fill:'#aaa','font-family':'Meiryo UI,sans-serif'});
+    tx.textContent=t; svg.appendChild(tx);
+    svg.appendChild(svgEl('line',{x1:x,y1:'212',x2:x,y2:'216',stroke:'#aaa','stroke-width':'0.5'}));
+  });
+  const axisLabel = svgEl('text',{x:'280',y:'246','text-anchor':'middle','font-size':'10',fill:'#aaa','font-family':'Meiryo UI,sans-serif'});
+  axisLabel.textContent='← 短波長（紫）　波長（nm）　長波長（赤）→';
+  svg.appendChild(axisLabel);
+
+  // 各錐体の曲線（背面から描画）
+  [...cones].reverse().forEach(cone => {
+    const path = svgEl('path',{d:cone.pathD, fill:cone.color, 'fill-opacity':'0.13', stroke:cone.color, 'stroke-width':'2.5', cursor:'pointer'});
+    svg.appendChild(path);
+  });
+
+  // ピーク点・ラベル・垂線（前面）
+  cones.forEach(cone => {
+    const peakX = 50 + (cone.peak - 380) / 400 * 460;
+
+    // 頂点から波長軸への垂線（点線）
+    svg.appendChild(svgEl('line',{
+      x1:peakX, y1:cone.peakCy+8, x2:peakX, y2:'200',
+      stroke:cone.color, 'stroke-width':'1', 'stroke-dasharray':'3 3', opacity:'0.5'
+    }));
+
+    // ピーク点（曲線頂点上）
+    const circle = svgEl('circle',{cx:peakX, cy:cone.peakCy, r:'5', fill:cone.color, stroke:'white', 'stroke-width':'1.5', cursor:'pointer'});
+    svg.appendChild(circle);
+
+    // ラベル（各自の高さに配置・重ならない）
+    const labelX = cone.id === 'S' ? peakX - 10 : cone.id === 'M' ? peakX - 5 : peakX + 5;
+    const anchor = cone.id === 'L' ? 'start' : 'end';
+    const tx = svgEl('text',{x:labelX, y:cone.labelY, 'text-anchor': anchor, 'font-size':'12', 'font-weight':'500', fill:cone.color, 'font-family':'Meiryo UI,sans-serif'});
+    tx.textContent = cone.label;
+    svg.appendChild(tx);
+
+    // 異常型サブラベル
+    const sub = svgEl('text',{x:labelX, y:cone.labelY+14, 'text-anchor':anchor, 'font-size':'10', fill:cone.color, opacity:'0.7', 'font-family':'Meiryo UI,sans-serif'});
+    sub.textContent = `→ ${cone.sublabel}`;
+    svg.appendChild(sub);
+
+    // ホバー
+    [path, circle].forEach(el => {
+      el.addEventListener('mouseenter', e => showTip(tip, e, `<strong>${cone.label}</strong><br>ピーク波長：約${cone.peak}nm<br>${cone.desc}`));
+      el.addEventListener('mousemove', e => moveTip(tip, e));
+      el.addEventListener('mouseleave', () => hideTip(tip));
+      el.addEventListener('click', e => {
+        if(tip.style.display==='none') showTip(tip,e,`<strong>${cone.label}</strong><br>ピーク波長：約${cone.peak}nm<br>${cone.desc}`);
+        else hideTip(tip);
+      });
     });
   });
-  // 無彩色
-  const achX=gridX+3*(cw+gap)+4;
-  out+=`<text x="${achX+achW/2}" y="${gridY-8}" text-anchor="middle" font-size="9" fill="#aaa" font-family="Meiryo UI,sans-serif">無彩色</text>`;
-  ach.forEach((a,i)=>{
-    const y=gridY+i*38;
-    out+=`<rect x="${achX}" y="${y}" width="${achW}" height="32" rx="6" fill="${a.bg}" stroke="rgba(128,128,128,.3)" stroke-width="0.5"/>`;
-    out+=`<text x="${achX+achW/2}" y="${y+16}" text-anchor="middle" dominant-baseline="central" font-size="10" font-weight="700" fill="${a.tc}" font-family="Meiryo UI,sans-serif">${a.abbr}</text>`;
+
+  // 解説ボックス（右下）
+  svg.appendChild(svgEl('rect',{x:'360',y:'130',width:'158',height:'62',rx:'6',fill:'var(--surface)',stroke:'var(--border)','stroke-width':'0.5'}));
+  [['P型：L錐体の異常','#cc2222',146],['D型：M錐体の異常','#339933',162],['T型：S錐体の異常','#4466ff',178]].forEach(([t,color,y])=>{
+    const tx=svgEl('text',{x:'370',y,'font-size':'11','font-weight':'500',fill:color,'font-family':'Meiryo UI,sans-serif'});
+    tx.textContent=t; svg.appendChild(tx);
   });
-  out+=`</svg>`;
-  return out;
+
+  wrap.appendChild(svg);
+  return wrap;
 }
 
-function getDiagramSolid() {
-  return `<svg width="100%" viewBox="0 0 560 340" style="display:block;max-width:100%;height:auto;overflow:hidden;margin:0 auto;">
-<defs>
-  <linearGradient id="axG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f0f0f0"/><stop offset="100%" stop-color="#1a1a1a"/></linearGradient>
-  <linearGradient id="lG" x1="1" y1="0" x2="0" y2="0"><stop offset="0%" stop-color="#888" stop-opacity="0"/><stop offset="100%" stop-color="#e05050"/></linearGradient>
-  <linearGradient id="rG" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#888" stop-opacity="0"/><stop offset="100%" stop-color="#4a90d9"/></linearGradient>
-</defs>
-<rect x="270" y="44" width="18" height="250" rx="4" fill="url(#axG)" stroke="#ddd" stroke-width="0.5"/>
-<text x="279" y="38" text-anchor="middle" font-size="11" fill="#888" font-family="Meiryo UI,sans-serif">白（W）</text>
-<text x="279" y="308" text-anchor="middle" font-size="11" fill="#888" font-family="Meiryo UI,sans-serif">黒（Bk）</text>
-<path d="M270,76 Q200,110 140,169 Q200,228 270,258 Z" fill="url(#lG)" opacity="0.7"/>
-<path d="M270,76 Q200,110 140,169 Q200,228 270,258" fill="none" stroke="#e05050" stroke-width="1.5" stroke-dasharray="5 3"/>
-<path d="M288,76 Q358,110 418,169 Q358,228 288,258 Z" fill="url(#rG)" opacity="0.7"/>
-<path d="M288,76 Q358,110 418,169 Q358,228 288,258" fill="none" stroke="#4a90d9" stroke-width="1.5" stroke-dasharray="5 3"/>
-<circle cx="140" cy="169" r="7" fill="#e05050" stroke="white" stroke-width="1.5"/>
-<text x="110" y="190" text-anchor="middle" font-size="11" fill="#c04040" font-family="Meiryo UI,sans-serif">純色（赤）</text>
-<text x="110" y="204" text-anchor="middle" font-size="10" fill="#aaa" font-family="Meiryo UI,sans-serif">v2</text>
-<circle cx="418" cy="169" r="7" fill="#4a90d9" stroke="white" stroke-width="1.5"/>
-<text x="448" y="190" text-anchor="middle" font-size="11" fill="#2a70b9" font-family="Meiryo UI,sans-serif">純色（青）</text>
-<text x="448" y="204" text-anchor="middle" font-size="10" fill="#aaa" font-family="Meiryo UI,sans-serif">v18</text>
-<text x="279" y="180" text-anchor="middle" font-size="10" fill="#aaa" font-family="Meiryo UI,sans-serif">← 彩度 →</text>
-<line x1="277" y1="169" x2="148" y2="169" stroke="#e05050" stroke-width="1" stroke-dasharray="3 3" opacity="0.5"/>
-<line x1="289" y1="169" x2="410" y2="169" stroke="#4a90d9" stroke-width="1" stroke-dasharray="3 3" opacity="0.5"/>
-<rect x="14" y="48" width="120" height="64" rx="6" fill="var(--bg)" stroke="var(--border)" stroke-width="0.5"/>
-<text x="74" y="68" text-anchor="middle" font-size="10" font-weight="500" fill="var(--text)" font-family="Meiryo UI,sans-serif">中心軸 = 無彩色</text>
-<text x="74" y="83" text-anchor="middle" font-size="10" fill="#888" font-family="Meiryo UI,sans-serif">（明度の軸）</text>
-<text x="74" y="100" text-anchor="middle" font-size="10" fill="#888" font-family="Meiryo UI,sans-serif">外側 = 高彩度</text>
-<text x="279" y="330" text-anchor="middle" font-size="10" fill="#aaa" font-family="Meiryo UI,sans-serif">※色相ごとに純色の明度が異なるため形は非対称</text>
-</svg>`;
-}
-
-function getDiagramCones() {
-  return `<svg width="100%" viewBox="0 0 560 260" style="display:block;max-width:100%;height:auto;overflow:hidden;margin:0 auto;">
-<defs>
-  <linearGradient id="spG" x1="0" y1="0" x2="1" y2="0">
-    <stop offset="0%" stop-color="#8800ff"/>
-    <stop offset="14%" stop-color="#3355ff"/>
-    <stop offset="28%" stop-color="#0088ff"/>
-    <stop offset="42%" stop-color="#00cccc"/>
-    <stop offset="55%" stop-color="#00cc00"/>
-    <stop offset="68%" stop-color="#aacc00"/>
-    <stop offset="80%" stop-color="#ffcc00"/>
-    <stop offset="90%" stop-color="#ff6600"/>
-    <stop offset="100%" stop-color="#cc0000"/>
-  </linearGradient>
-</defs>
-<rect x="50" y="195" width="460" height="14" rx="3" fill="url(#spG)" opacity="0.8"/>
-<line x1="50" y1="209" x2="514" y2="209" stroke="#bbb" stroke-width="0.5"/>
-<text x="50"  y="222" text-anchor="middle" font-size="9" fill="#aaa" font-family="Meiryo UI,sans-serif">380</text>
-<text x="167" y="222" text-anchor="middle" font-size="9" fill="#aaa" font-family="Meiryo UI,sans-serif">450</text>
-<text x="280" y="222" text-anchor="middle" font-size="9" fill="#aaa" font-family="Meiryo UI,sans-serif">550nm</text>
-<text x="397" y="222" text-anchor="middle" font-size="9" fill="#aaa" font-family="Meiryo UI,sans-serif">650</text>
-<text x="510" y="222" text-anchor="middle" font-size="9" fill="#aaa" font-family="Meiryo UI,sans-serif">780</text>
-<text x="280" y="240" text-anchor="middle" font-size="10" fill="#aaa" font-family="Meiryo UI,sans-serif">波長（nm）　短波長（紫）→　　　←長波長（赤）</text>
-<path d="M50,195 Q90,193 120,186 Q140,150 142,105 Q144,55 150,44 Q156,34 162,48 Q170,68 185,140 Q210,182 270,192 Q380,198 510,196" fill="#4466ff" fill-opacity="0.13" stroke="#4466ff" stroke-width="2"/>
-<circle cx="150" cy="42" r="4" fill="#4466ff"/>
-<text x="150" y="30" text-anchor="middle" font-size="11" font-weight="500" fill="#4466ff" font-family="Meiryo UI,sans-serif">S錐体（青）</text>
-<path d="M50,196 Q100,194 160,188 Q210,178 255,158 Q278,132 284,96 Q290,58 297,44 Q304,32 312,48 Q326,74 352,138 Q395,182 450,192 Q490,196 510,196" fill="#44bb44" fill-opacity="0.15" stroke="#44bb44" stroke-width="2"/>
-<circle cx="297" cy="42" r="4" fill="#44bb44"/>
-<text x="297" y="30" text-anchor="middle" font-size="11" font-weight="500" fill="#229922" font-family="Meiryo UI,sans-serif">M錐体（緑）</text>
-<path d="M50,196 Q150,194 230,190 Q275,182 320,168 Q362,148 385,120 Q405,94 418,68 Q430,46 440,42 Q450,38 460,52 Q475,76 492,140 Q506,180 510,194" fill="#ff4444" fill-opacity="0.13" stroke="#cc2222" stroke-width="2"/>
-<circle cx="440" cy="40" r="4" fill="#cc2222"/>
-<text x="440" y="28" text-anchor="middle" font-size="11" font-weight="500" fill="#cc2222" font-family="Meiryo UI,sans-serif">L錐体（赤）</text>
-<rect x="350" y="120" width="156" height="60" rx="6" fill="var(--bg)" stroke="var(--border)" stroke-width="0.5"/>
-<text x="428" y="138" text-anchor="middle" font-size="10" font-weight="500" fill="var(--text)" font-family="Meiryo UI,sans-serif">P型：L錐体の異常</text>
-<text x="428" y="152" text-anchor="middle" font-size="10" fill="var(--text)" font-family="Meiryo UI,sans-serif">D型：M錐体の異常</text>
-<text x="428" y="166" text-anchor="middle" font-size="10" fill="var(--text)" font-family="Meiryo UI,sans-serif">T型：S錐体の異常</text>
-</svg>`;
-}
-
+// ── d05: 混同色線 ──
 function getDiagramConfusion() {
-  return `<svg width="100%" viewBox="0 0 560 320" style="display:block;max-width:100%;height:auto;overflow:hidden;margin:0 auto;">
-<path d="M80,278 L280,38 L478,278 Z" fill="none" stroke="#ddd" stroke-width="1" stroke-dasharray="5 4"/>
-<text x="280" y="296" text-anchor="middle" font-size="10" fill="#bbb" font-family="Meiryo UI,sans-serif">← 色度図の外形（概念図）</text>
-<circle cx="400" cy="168" r="13" fill="#e85050" opacity=".9"/><text x="400" y="168" text-anchor="middle" dominant-baseline="central" font-size="10" font-weight="500" fill="white" font-family="Meiryo UI,sans-serif">赤</text>
-<circle cx="220" cy="150" r="13" fill="#44aa44" opacity=".9"/><text x="220" y="150" text-anchor="middle" dominant-baseline="central" font-size="10" font-weight="500" fill="white" font-family="Meiryo UI,sans-serif">緑</text>
-<circle cx="350" cy="225" r="11" fill="#7a3a1a" opacity=".9"/><text x="350" y="225" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="500" fill="white" font-family="Meiryo UI,sans-serif">焦茶</text>
-<circle cx="186" cy="208" r="11" fill="#1a5a28" opacity=".9"/><text x="186" y="208" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="500" fill="white" font-family="Meiryo UI,sans-serif">深緑</text>
-<circle cx="374" cy="126" r="11" fill="#f08888" opacity=".9"/><text x="374" y="126" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="500" fill="#7a2020" font-family="Meiryo UI,sans-serif">ピンク</text>
-<circle cx="256" cy="178" r="11" fill="#999" opacity=".9"/><text x="256" y="178" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="500" fill="white" font-family="Meiryo UI,sans-serif">灰</text>
-<circle cx="382" cy="95" r="11" fill="#f07020" opacity=".9"/><text x="382" y="95" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="500" fill="white" font-family="Meiryo UI,sans-serif">橙</text>
-<circle cx="236" cy="118" r="11" fill="#88cc22" opacity=".9"/><text x="236" y="118" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="500" fill="#3a5a00" font-family="Meiryo UI,sans-serif">黄緑</text>
-<line x1="387" y1="168" x2="233" y2="150" stroke="#e05050" stroke-width="2" stroke-dasharray="5 3" opacity="0.75"/>
-<line x1="389" y1="176" x2="339" y2="215" stroke="#e05050" stroke-width="2" stroke-dasharray="5 3" opacity="0.75"/>
-<line x1="208" y1="158" x2="195" y2="198" stroke="#e05050" stroke-width="2" stroke-dasharray="5 3" opacity="0.75"/>
-<line x1="363" y1="133" x2="265" y2="172" stroke="#e05050" stroke-width="2" stroke-dasharray="5 3" opacity="0.75"/>
-<line x1="391" y1="162" x2="229" y2="144" stroke="#44aa44" stroke-width="2" stroke-dasharray="5 3" opacity="0.7"/>
-<line x1="374" y1="102" x2="244" y2="115" stroke="#44aa44" stroke-width="2" stroke-dasharray="5 3" opacity="0.7"/>
-<line x1="339" y1="225" x2="197" y2="212" stroke="#44aa44" stroke-width="2" stroke-dasharray="5 3" opacity="0.7"/>
-<circle cx="85" cy="278" r="6" fill="none" stroke="#aaa" stroke-width="1.5"/>
-<text x="85" y="292" text-anchor="middle" font-size="9" fill="#aaa" font-family="Meiryo UI,sans-serif">収束点</text>
-<line x1="208" y1="158" x2="92" y2="272" stroke="#e05050" stroke-width="0.8" stroke-dasharray="2 5" opacity="0.3"/>
-<rect x="420" y="50" width="128" height="120" rx="6" fill="var(--bg)" stroke="var(--border)" stroke-width="0.5"/>
-<text x="484" y="68" text-anchor="middle" font-size="11" font-weight="500" fill="var(--text)" font-family="Meiryo UI,sans-serif">混同色線とは</text>
-<text x="484" y="86"  text-anchor="middle" font-size="10" fill="#888" font-family="Meiryo UI,sans-serif">同じ線上の色は</text>
-<text x="484" y="100" text-anchor="middle" font-size="10" fill="#888" font-family="Meiryo UI,sans-serif">P型・D型には</text>
-<text x="484" y="114" text-anchor="middle" font-size="10" fill="#888" font-family="Meiryo UI,sans-serif">同じ色に見える</text>
-<text x="484" y="132" text-anchor="middle" font-size="9" fill="#bbb" font-family="Meiryo UI,sans-serif">— P型の線</text>
-<text x="484" y="148" text-anchor="middle" font-size="9" fill="#bbb" font-family="Meiryo UI,sans-serif">— D型の線</text>
-</svg>`;
-}
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'padding:8px 0;';
+  const tip = makeTooltip(wrap);
 
+  const colorDots = [
+    {label:'赤',   x:400,y:168,r:14,fill:'#e85050',tc:'white', desc:'P型・D型の代表的な混同色。赤と緑は最もよく出る混同色線のペア。'},
+    {label:'緑',   x:220,y:150,r:14,fill:'#44aa44',tc:'white', desc:'赤と同じ混同色線上にある。P型・D型には赤と同じ色に見えることがある。'},
+    {label:'焦茶', x:350,y:225,r:12,fill:'#7a3a1a',tc:'white', desc:'赤の低明度・低彩度版。深緑と混同色線上に並ぶ。'},
+    {label:'深緑', x:186,y:208,r:12,fill:'#1a5a28',tc:'white', desc:'緑の低明度・低彩度版。焦茶と混同色線上に並ぶ。'},
+    {label:'ピンク',x:374,y:126,r:12,fill:'#f08888',tc:'#7a2020',desc:'赤の高明度・低彩度版。灰色と混同色線上に並ぶ。'},
+    {label:'灰',   x:256,y:178,r:12,fill:'#999',   tc:'white', desc:'無彩色。ピンクと混同色線上に並ぶため、P型・D型には区別しにくい。'},
+    {label:'橙',   x:382,y:95, r:12,fill:'#f07020',tc:'white', desc:'オレンジと黄緑も混同色線上に並ぶペア。'},
+    {label:'黄緑', x:236,y:118,r:12,fill:'#88cc22',tc:'#3a5a00',desc:'黄緑と橙も混同色線上のペア。P型・D型には区別しにくい。'},
+  ];
+
+  const confusionLines = [
+    {x1:387,y1:168,x2:233,y2:150,stroke:'#e05050',label:'赤⇔緑（P型）'},
+    {x1:389,y1:176,x2:339,y2:215,stroke:'#e05050',label:'赤⇔焦茶（P型）'},
+    {x1:208,y1:158,x2:195,y2:198,stroke:'#e05050',label:'緑⇔深緑（P型）'},
+    {x1:363,y1:133,x2:265,y2:172,stroke:'#e05050',label:'ピンク⇔灰（P型）'},
+    {x1:391,y1:162,x2:229,y2:144,stroke:'#44aa44',label:'赤⇔緑（D型）'},
+    {x1:374,y1:102,x2:244,y2:115,stroke:'#44aa44',label:'橙⇔黄緑（D型）'},
+    {x1:339,y1:225,x2:197,y2:212,stroke:'#44aa44',label:'焦茶⇔深緑（D型）'},
+  ];
+
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('width','100%');
+  svg.setAttribute('viewBox','0 0 560 320');
+  svg.style.cssText = 'display:block;max-width:100%;height:auto;';
+
+  // 外枠
+  svg.appendChild(svgEl('path',{d:'M80,278 L280,38 L478,278 Z',fill:'none',stroke:'#ddd','stroke-width':'1','stroke-dasharray':'5 4'}));
+  const footerTx = svgEl('text',{x:'280',y:'296','text-anchor':'middle','font-size':'10',fill:'#ccc','font-family':'Meiryo UI,sans-serif'});
+  footerTx.textContent='← 色度図の外形（概念図）';
+  svg.appendChild(footerTx);
+
+  // 混同色線
+  confusionLines.forEach(line => {
+    const l = svgEl('line',{x1:line.x1,y1:line.y1,x2:line.x2,y2:line.y2,stroke:line.stroke,'stroke-width':'2','stroke-dasharray':'5 3',opacity:'0.75',cursor:'pointer'});
+    l.addEventListener('mouseenter', e => showTip(tip, e, `<strong>${line.label}</strong><br>この線上の色はP型またはD型には同じ色に見える`));
+    l.addEventListener('mousemove', e => moveTip(tip, e));
+    l.addEventListener('mouseleave', () => hideTip(tip));
+    svg.appendChild(l);
+  });
+
+  // 収束点
+  svg.appendChild(svgEl('circle',{cx:'85',cy:'278',r:'6',fill:'none',stroke:'#aaa','stroke-width':'1.5'}));
+  const convTx = svgEl('text',{x:'85',y:'292','text-anchor':'middle','font-size':'9',fill:'#aaa','font-family':'Meiryo UI,sans-serif'});
+  convTx.textContent='収束点'; svg.appendChild(convTx);
+
+  // 色ドット
+  colorDots.forEach(d => {
+    const g = svgEl('g',{cursor:'pointer'});
+    g.appendChild(svgEl('circle',{cx:d.x,cy:d.y,r:d.r,fill:d.fill,opacity:'.9'}));
+    const tx = svgEl('text',{x:d.x,y:d.y,'text-anchor':'middle','dominant-baseline':'central','font-size':d.r<13?'9':'10','font-weight':'500',fill:d.tc,'font-family':'Meiryo UI,sans-serif'});
+    tx.textContent=d.label; g.appendChild(tx);
+    g.addEventListener('mouseenter', e => { showTip(tip, e, `<strong>${d.label}</strong><br>${d.desc}`); });
+    g.addEventListener('mousemove', e => moveTip(tip, e));
+    g.addEventListener('mouseleave', () => hideTip(tip));
+    g.addEventListener('click', e => { if(tip.style.display==='none'){showTip(tip,e,`<strong>${d.label}</strong><br>${d.desc}`);}else{hideTip(tip);} });
+    svg.appendChild(g);
+  });
+
+  // 解説ボックス
+  svg.appendChild(svgEl('rect',{x:'420',y:'48',width:'128',height:'122',rx:'6',fill:'var(--surface)',stroke:'var(--border)','stroke-width':'0.5'}));
+  [['混同色線とは',66],['同じ線上の色は',84],['P型・D型には',98],['同じ色に見える',112]].forEach(([t,y])=>{
+    const tx=svgEl('text',{x:'484',y,'text-anchor':'middle','font-size': t==='混同色線とは'?'11':'10','font-weight':t==='混同色線とは'?'500':'400',fill:t==='混同色線とは'?'var(--text)':'#888','font-family':'Meiryo UI,sans-serif'});
+    tx.textContent=t; svg.appendChild(tx);
+  });
+  // 凡例
+  [['#e05050','P型の混同色線',130],['#44aa44','D型の混同色線',146]].forEach(([color,label,y])=>{
+    svg.appendChild(svgEl('line',{x1:'426',y1:y,x2:'446',y2:y,stroke:color,'stroke-width':'2','stroke-dasharray':'4 2'}));
+    const lTx=svgEl('text',{x:'450',y,'dominant-baseline':'central','font-size':'9',fill:'#888','font-family':'Meiryo UI,sans-serif'});
+    lTx.textContent=label; svg.appendChild(lTx);
+  });
+
+  wrap.appendChild(svg);
+  return wrap;
+}
 
 </script>
 </body>
