@@ -646,11 +646,11 @@ function addRuby(text) {
 //  図解モード
 // ============================================================
 const DIAGRAMS = [
-  { id:'d01', title:'PCCS 色相環（24色相）',      subtitle:'各色をタップで番号・名前を確認', related:['q05','q16','b04','b07'] },
-  { id:'d02', title:'PCCSトーンマップ（12トーン）', subtitle:'', related:['q05','q16','b04'] },
-  { id:'d03', title:'色立体の断面図',              subtitle:'無彩色軸・彩度・純色の位置関係', related:['q05','q17'] },
-  { id:'d04', title:'錐体と混同色線のつながり',    subtitle:'錐体の異常→P型/D型それぞれの混同の仕組み', related:['q03','q04','q06','q07','q08','q11','q22'] },
-  { id:'d05', title:'目の構造と加齢変化',          subtitle:'眼球断面図・高齢者の見え方', related:['q10','q23','q28'] },
+  { id:'d01', title:'PCCS 色相環（24色相）',      subtitle:'各色をタップで番号・名前を確認', related:['q11','q12','b02','b07'] },
+  { id:'d02', title:'PCCSトーンマップ（12トーン）', subtitle:'', related:['q11','b02'] },
+  { id:'d03', title:'色立体の断面図',              subtitle:'無彩色軸・彩度・純色の位置関係', related:['q11','q35'] },
+  { id:'d04', title:'錐体と混同色線のつながり',    subtitle:'錐体の異常→P型/D型それぞれの混同の仕組み', related:['q03','q04','q13','q15','q25'] },
+  { id:'d05', title:'目の構造と加齢変化',          subtitle:'眼球断面図・高齢者の見え方', related:['q05','q06','q07','q08','q09','q20','q21','q23'] },
 ];
 
 function renderDiagramsMode(main) {
@@ -888,7 +888,8 @@ const QUESTIONS = [
       '無彩色：N5のように N＋明度値で表す',
       'PCCSと並ぶ代表的な表色系',
     ],
-    memory:'🧠 マンセル＝HV/C（色相・明度/彩度）。「5R 4/14」と読む。無彩色はN！'
+    memory:'🧠 マンセル＝HV/C（色相・明度/彩度）。「5R 4/14」と読む。無彩色はN！',
+    diagrams:[['d01','🎨 PCCS色相環'],['d03','📐 色立体']]
   },
 
   {
@@ -1538,6 +1539,12 @@ function renderMain() {
   main.querySelectorAll('.question-text, .answer-main, .answer-detail li, .memory-tip').forEach(el => {
     el.innerHTML = addRuby(el.innerHTML);
   });
+  // メモ欄にlocalStorageの値をセット
+  main.querySelectorAll('.note-field').forEach(ta => {
+    const id = ta.id.replace('note-', '');
+    const saved = loadNote(id);
+    if (saved) ta.value = saved;
+  });
 }
 
 function buildCard(q, num) {
@@ -1618,7 +1625,7 @@ function buildCard(q, num) {
     </div>
     ${btnHTML}
     <div class="note-area">
-      <textarea class="note-field" id="note-${q.id}" placeholder="ここに自由にメモを書けます…" oninput="scheduleNoteSave('${q.id}', this.value)">${loadNote('${q.id}')}</textarea>
+      <textarea class="note-field" id="note-${q.id}" placeholder="ここに自由にメモを書けます…" oninput="scheduleNoteSave('${q.id}', this.value)"></textarea>
       <div class="note-status" id="note-status-${q.id}">3秒後に自動保存します</div>
     </div>
   `;
