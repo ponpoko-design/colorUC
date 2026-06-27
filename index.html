@@ -10,8 +10,8 @@
   --bg: #F4F3F0;
   --surface: #FFFFFF;
   --border: #E0DDD7;
-  --accent: #3B6EA5;
-  --accent-light: #EAF0F8;
+  --accent: #0891B2;
+  --accent-light: #E0F5FA;
   --green: #2A8A5A;
   --green-light: #E8F5EE;
   --red: #C0392B;
@@ -273,11 +273,12 @@ rt { font-size: 0.55em; color: var(--text-sub); }
   display: none;
   margin-top: 14px;
   padding: 14px 16px;
-  background: var(--accent-light);
-  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   border-left: 4px solid var(--accent);
 }
 .answer-area.show { display: block; }
+.answer-label::before { content: '▶ '; }
 .answer-label {
   font-size: 11px;
   font-weight: 700;
@@ -288,7 +289,7 @@ rt { font-size: 0.55em; color: var(--text-sub); }
 .answer-main {
   font-size: 14px;
   font-weight: 700;
-  color: #1a3a5c;
+  color: var(--text);
   margin-bottom: 6px;
   line-height: 1.55;
 }
@@ -345,10 +346,10 @@ rt { font-size: 0.55em; color: var(--text-sub); }
 }
 .btn-show  { background: var(--accent); color:#fff; }
 .btn-show:hover  { background: #2d5a8a; }
-.btn-ok    { background: var(--green); color:#fff; }
-.btn-ok:hover    { background: #1e6b42; }
-.btn-ng    { background: var(--red-light); color: var(--red); border: 1.5px solid var(--red); }
-.btn-ng:hover    { background: #fbd5d2; }
+.btn-ok    { background: var(--accent); color:#fff; }
+.btn-ok:hover    { background: #0678A0; }
+.btn-ng    { background: var(--surface); color: var(--text); border: 1.5px solid var(--border); }
+.btn-ng:hover    { background: var(--bg); }
 .btn-check { background: var(--purple); color:#fff; }
 .btn-check:hover { background: #5548b0; }
 .btn-next  { background: var(--bg); color: var(--text); border: 1.5px solid var(--border); }
@@ -567,6 +568,7 @@ rt { font-size: 0.55em; color: var(--text-sub); }
   max-width: 100%;
 }
 </style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 </head>
 <body>
 
@@ -678,6 +680,8 @@ function renderDiagramsMode(main) {
       btn.style.color = isActive ? '#fff' : 'var(--text-sub)';
       btn.style.borderColor = isActive ? 'var(--accent)' : 'var(--border)';
       btn.style.fontWeight = isActive ? '700' : '400';
+      btn.style.textDecoration = isActive ? 'underline' : 'none';
+      btn.style.textUnderlineOffset = '3px';
     });
     // 図を描画
     diagramArea.innerHTML = '';
@@ -1643,23 +1647,23 @@ function buildCard(q, num) {
   if (q.type === 'blank') {
     btnHTML = `
       <div class="btn-row">
-        <button class="btn btn-check" id="btn-check-${q.id}" onclick="checkBlanks('${q.id}')">✅ 答え合わせ</button>
-        <button class="btn btn-ok" onclick="markOk('${q.id}')" id="btn-ok-${q.id}">わかった 👍</button>
-        <button class="btn btn-ng" onclick="markNg('${q.id}')">まだ 👎</button>
+        <button class="btn btn-check" id="btn-check-${q.id}" onclick="checkBlanks('${q.id}')"><i class="ti ti-clipboard-check" style="font-size:15px;vertical-align:-2px;" aria-hidden="true"></i> 答え合わせ</button>
+        <button class="btn btn-ok" onclick="markOk('${q.id}')" id="btn-ok-${q.id}"><i class="ti ti-thumb-up" style="font-size:15px;vertical-align:-2px;" aria-hidden="true"></i> わかった</button>
+        <button class="btn btn-ng" onclick="markNg('${q.id}')"><i class="ti ti-thumb-down" style="font-size:15px;vertical-align:-2px;" aria-hidden="true"></i> まだ</button>
       </div>`;
   } else if (q.type === 'compare') {
     btnHTML = `
       <div class="btn-row">
         <button class="btn btn-show" onclick="revealCompare('${q.id}')">👁 答えを見る</button>
-        <button class="btn btn-ok" onclick="markOk('${q.id}')">わかった 👍</button>
-        <button class="btn btn-ng" onclick="markNg('${q.id}')">まだ 👎</button>
+        <button class="btn btn-ok" onclick="markOk('${q.id}')"><i class="ti ti-thumb-up" style="font-size:15px;vertical-align:-2px;" aria-hidden="true"></i> わかった</button>
+        <button class="btn btn-ng" onclick="markNg('${q.id}')"><i class="ti ti-thumb-down" style="font-size:15px;vertical-align:-2px;" aria-hidden="true"></i> まだ</button>
       </div>`;
   } else {
     btnHTML = `
       <div class="btn-row">
-        <button class="btn btn-show" id="btn-show-${q.id}" onclick="showAnswer('${q.id}')">💡 答えを見る</button>
-        <button class="btn btn-ok" onclick="markOk('${q.id}')" id="btn-ok-${q.id}">わかった 👍</button>
-        <button class="btn btn-ng" onclick="markNg('${q.id}')">まだ 👎</button>
+        <button class="btn btn-show" id="btn-show-${q.id}" onclick="showAnswer('${q.id}')"><i class="ti ti-eye" style="font-size:15px;vertical-align:-2px;" aria-hidden="true"></i> 答えを見る</button>
+        <button class="btn btn-ok" onclick="markOk('${q.id}')" id="btn-ok-${q.id}"><i class="ti ti-thumb-up" style="font-size:15px;vertical-align:-2px;" aria-hidden="true"></i> わかった</button>
+        <button class="btn btn-ng" onclick="markNg('${q.id}')"><i class="ti ti-thumb-down" style="font-size:15px;vertical-align:-2px;" aria-hidden="true"></i> まだ</button>
       </div>`;
   }
 
@@ -1717,11 +1721,11 @@ function showAnswer(id) {
   if (isOpen) {
     ans.classList.remove('show');
     if(tip) tip.classList.remove('show');
-    if(btn) btn.textContent = '💡 答えを見る';
+    if(btn) btn.innerHTML = '<i class="ti ti-eye" style="font-size:15px;vertical-align:-2px;" aria-hidden="true"></i> 答えを見る';
   } else {
     ans.classList.add('show');
     if(tip) tip.classList.add('show');
-    if(btn) btn.textContent = '🙈 閉じる';
+    if(btn) btn.innerHTML = '<i class="ti ti-eye-off" style="font-size:15px;vertical-align:-2px;" aria-hidden="true"></i> 閉じる';
   }
 }
 
@@ -1754,11 +1758,11 @@ function checkBlanks(id) {
   if (isOpen) {
     if(ansEl) ansEl.classList.remove('show');
     if(tipEl) tipEl.classList.remove('show');
-    if(btn) btn.textContent = '✅ 答え合わせ';
+    if(btn) btn.innerHTML = '<i class="ti ti-clipboard-check" style="font-size:15px;vertical-align:-2px;" aria-hidden="true"></i> 答え合わせ';
   } else {
     if(ansEl) ansEl.classList.add('show');
     if(tipEl) tipEl.classList.add('show');
-    if(btn) btn.textContent = '🙈 閉じる';
+    if(btn) btn.innerHTML = '<i class="ti ti-eye-off" style="font-size:15px;vertical-align:-2px;" aria-hidden="true"></i> 閉じる';
   }
 }
 
