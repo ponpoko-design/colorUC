@@ -10,7 +10,7 @@
   --bg: #F4F3F0;
   --surface: #FFFFFF;
   --border: #E0DDD7;
-  --accent: #0891B2;
+  --accent: #0EA5C9;
   --accent-light: #E0F5FA;
   --green: #2A8A5A;
   --green-light: #E8F5EE;
@@ -335,7 +335,7 @@ rt { font-size: 0.55em; color: var(--text-sub); }
 .btn {
   flex: 1;
   min-width: 80px;
-  padding: 11px 16px;
+  padding: 7px 16px;
   border-radius: 8px;
   border: none;
   font-size: 13px;
@@ -347,7 +347,7 @@ rt { font-size: 0.55em; color: var(--text-sub); }
 .btn-show  { background: var(--accent); color:#fff; }
 .btn-show:hover  { background: #2d5a8a; }
 .btn-ok    { background: var(--accent); color:#fff; }
-.btn-ok:hover    { background: #0678A0; }
+.btn-ok:hover    { background: #0891B2; }
 .btn-ng    { background: var(--surface); color: var(--text); border: 1.5px solid var(--border); }
 .btn-ng:hover    { background: var(--bg); }
 .btn-check { background: var(--purple); color:#fff; }
@@ -448,7 +448,7 @@ rt { font-size: 0.55em; color: var(--text-sub); }
   .memory-tip-label { font-size: 13px; }
 
   /* ボタン */
-  .btn { font-size: 14px; padding: 14px 10px; }
+  .btn { font-size: 14px; padding: 9px 10px; }
   .btn-row { gap: 7px; }
 
   /* 図解ボタン（カード内） */
@@ -1661,7 +1661,7 @@ function buildCard(q, num) {
   } else {
     btnHTML = `
       <div class="btn-row">
-        <button class="btn btn-show" id="btn-show-${q.id}" onclick="showAnswer('${q.id}')"><i class="ti ti-eye" style="font-size:15px;vertical-align:-2px;" aria-hidden="true"></i> 答えを見る</button>
+        <button class="btn btn-show" id="btn-show-${q.id}" onclick="showAnswer('${q.id}')"><i class="ti ti-eye" style="font-size:15px;vertical-align:-2px;" aria-hidden="true"></i> 答え</button>
         <button class="btn btn-ok" onclick="markOk('${q.id}')" id="btn-ok-${q.id}"><i class="ti ti-thumb-up" style="font-size:15px;vertical-align:-2px;" aria-hidden="true"></i> わかった</button>
         <button class="btn btn-ng" onclick="markNg('${q.id}')"><i class="ti ti-thumb-down" style="font-size:15px;vertical-align:-2px;" aria-hidden="true"></i> まだ</button>
       </div>`;
@@ -1721,7 +1721,7 @@ function showAnswer(id) {
   if (isOpen) {
     ans.classList.remove('show');
     if(tip) tip.classList.remove('show');
-    if(btn) btn.innerHTML = '<i class="ti ti-eye" style="font-size:15px;vertical-align:-2px;" aria-hidden="true"></i> 答えを見る';
+    if(btn) btn.innerHTML = '<i class="ti ti-eye" style="font-size:15px;vertical-align:-2px;" aria-hidden="true"></i> 答え';
   } else {
     ans.classList.add('show');
     if(tip) tip.classList.add('show');
