@@ -16,7 +16,7 @@
   --green-light: #E8F5EE;
   --red: #C0392B;
   --red-light: #FDECEA;
-  --orange: #C85A2A;
+  --orange: #F97316;
   --purple: #6A5ACD;
   --gold: #8B6914;
   --text: #1E1E1E;
@@ -362,7 +362,7 @@ rt { font-size: 0.55em; color: var(--text-sub); }
   position: absolute;
   top: 14px;
   right: 16px;
-  background: var(--green);
+  background: var(--orange);
   color: #fff;
   font-size: 11px;
   font-weight: 700;
@@ -370,7 +370,7 @@ rt { font-size: 0.55em; color: var(--text-sub); }
   border-radius: 20px;
 }
 .quiz-card.mastered .mastered-badge { display: block; }
-.quiz-card.mastered { border-color: var(--green); }
+.quiz-card.mastered { border-color: var(--orange); }
 
 /* ── 復習モード（まだリスト）── */
 #retry-empty {
@@ -1668,7 +1668,7 @@ function buildCard(q, num) {
   }
 
   return `
-    <span class="mastered-badge">✅ マスター済み</span>
+    <span class="mastered-badge"><i class="ti ti-check" style="font-size:13px;vertical-align:-1px;" aria-hidden="true"></i> マスター済み</span>
     <div class="card-meta">
       <span class="card-type ${typeClass}">${typeLabel}</span>
       <span class="card-num">Q${num}</span>
