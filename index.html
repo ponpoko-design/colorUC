@@ -649,8 +649,8 @@ const DIAGRAMS = [
   { id:'d01', title:'PCCS 色相環（24色相）',      subtitle:'各色をタップで番号・名前を確認', related:['q11','q12','b02','b07'] },
   { id:'d02', title:'PCCSトーンマップ（12トーン）', subtitle:'', related:['q11','b02'] },
   { id:'d03', title:'色立体の断面図',              subtitle:'無彩色軸・彩度・純色の位置関係', related:['q11','q35'] },
-  { id:'d04', title:'錐体と混同色線のつながり',    subtitle:'錐体の異常→P型/D型それぞれの混同の仕組み', related:['q03','q04','q13','q15','q25'] },
-  { id:'d05', title:'目の構造と加齢変化',          subtitle:'眼球断面図・高齢者の見え方', related:['q05','q06','q07','q08','q09','q20','q21','q23'] },
+  { id:'d04', title:'錐体と混同色線のつながり',    subtitle:'錐体の異常→P型/D型それぞれの混同の仕組み', related:['q03','q04','q10new','q13','q15','q25'] },
+  { id:'d05', title:'目の構造と加齢変化',          subtitle:'眼球断面図・高齢者の見え方', related:['q05','q06','q07','q08','q09','q10new','q20','q21','q23'] },
 ];
 
 function renderDiagramsMode(main) {
@@ -754,6 +754,33 @@ const QUESTIONS = [
     a:'①色を適切に選ぶ ②色以外の情報も併用する ③確認・伝える（検証する）',
     detail:['①色を選ぶ：明度差・彩度差を活用し、混同色の組み合わせを避ける','②色以外を使う：形・模様・文字・アイコンを組み合わせる','③きちんと伝える：シミュレーションや当事者確認で検証する'],
     memory:'🧠 選ぶ→加える→確認する。3ステップの順番ごと覚えよう！'
+  },
+
+  {
+    id:'q03new', type:'quiz', chapter:'Ch.1 色のUDとは',
+    q:'ユニバーサルデザインの概念を提唱したのは誰か。またその出発点となった思想と提唱者は？',
+    a:'UDを提唱したのはロナルド・メイス（アメリカ）。7原則も提唱。出発点はバンク・ミケルセン（デンマーク）が提唱した「ノーマライゼーション」の思想。',
+    detail:[
+      'ロナルド・メイス：1980年代にUD提唱。自身も車椅子ユーザー。7原則も発表',
+      'ノーマライゼーション：バンク・ミケルセン（デンマーク）が提唱',
+      '障害者も健常者と同じ生活条件を→UDの考え方の源流',
+      'アクセシブルデザイン：UDの欧州における一般的な呼称',
+    ],
+    memory:'🧠 UD提唱＝ロナルド・メイス（7原則も）。出発点＝バンク・ミケルセンのノーマライゼーション！',
+    priority:'high',
+  },
+
+  {
+    id:'q04new', type:'quiz', chapter:'Ch.1 色のUDとは',
+    q:'人間中心設計（HCD）とは何か。UDやアクセシブルデザインとの違いも答えよ。',
+    a:'人間中心設計とは、設定した対象ユーザーのニーズの分析・設計・評価を繰り返す考え方。UDはすべての人が対象、HCDは特定ユーザーが対象。アクセシブルデザインはUDの欧州での呼称。',
+    detail:[
+      '人間中心設計（HCD）：対象ユーザーを設定して分析→設計→評価を反復',
+      'UD：最初から全員対象・特別対応不要を目指す',
+      'アクセシブルデザイン：高齢者・障害者配慮設計。UDの欧州での呼称',
+      'バリアフリー：既存の障壁を後付けで取り除く考え方',
+    ],
+    memory:'🧠 HCD＝特定ユーザー対象の反復設計。UD＝全員対象。アクセシブルデザイン＝UDの欧州呼称！',
   },
 
   {
@@ -865,6 +892,21 @@ const QUESTIONS = [
     a:'A=380 / B=780 / C=780 / D=380',
     detail:['赤（長波長）：約780nm','紫（短波長）：約380nm','可視光線：380〜780nm','この範囲より短い→紫外線、長い→赤外線'],
     memory:'🧠 「3・8・0から7・8・0」。両端を覚えればOK！赤が780、紫が380。'
+  },
+
+  {
+    id:'q10new', type:'quiz', chapter:'Ch.2 色が見えるしくみ',
+    q:'錐体細胞において、黄か青かの感覚とその色みの強さはどのように生じるか。',
+    a:'S錐体の反応と、L錐体とM錐体の反応の和とを比較した差から生じる。',
+    detail:[
+      '赤か緑か：L錐体とM錐体の反応の「差」から生じる',
+      '黄か青か：S錐体の反応 vs（L錐体＋M錐体の和）の「差」から生じる',
+      '色の見え方は錐体間の差信号によって生じる（段階説の考え方）',
+      '①SとMの差→誤り ②MとL+Sの和の差→誤り ④SとLの差→誤り',
+    ],
+    memory:'🧠 黄か青か＝S vs (L+M)の差！赤か緑か＝L vs Mの差！錐体の「差」が色覚を生む！',
+    priority:'high',
+    diagrams:[['d04','🔬 錐体と混同色線']],
   },
 
   {
@@ -1129,6 +1171,22 @@ const QUESTIONS = [
     a:'A=2018 / B=P / C=D / D=黄',
     detail:['旧来の緑：P型・D型には灰色に見えていた','ロービジョンの人には青と見分けにくかった','2018年改訂：黄みの緑に変更','規格改正の実例として試験頻出'],
     memory:'🧠 2018年・PD型・黄みの緑。「2018年にPDを救う黄緑誕生！」'
+  },
+
+  {
+    id:'q29new', type:'quiz', chapter:'Ch.6 見分けにくい色と改善',
+    q:'色の識別性とは何か。複数の色を使う際に注意すべきことは？',
+    a:'色の識別性とは、複数の対象を色によって区別しやすくする色のはたらきのこと。複数の色を使う場合は、色覚タイプによって区別しにくい色の組み合わせがあるため注意が必要。',
+    detail:[
+      '色の識別性：複数の対象を色で区別しやすくするはたらき',
+      '可読性：文字の読みやすさ（文字色と背景色の明度差が重要）',
+      '色覚タイプによって区別しにくい色の組み合わせが存在する',
+      '特にP型・D型は赤・緑系、ロービジョンは全般的にコントラストが低いと区別しにくい',
+      '制作時はシミュレーションツールで色覚タイプ別の見え方を確認することが大切',
+    ],
+    memory:'🧠 識別性＝複数の対象を色で区別するはたらき。色覚タイプで見えにくい組み合わせに注意！',
+    priority:'high',
+    diagrams:[['d04','🔬 錐体と混同色線']],
   },
 
   {
@@ -1968,51 +2026,37 @@ function getDiagramSolid() {
 
   const svgWrap = document.createElement('div');
   svgWrap.style.cssText = 'cursor:zoom-in;position:relative;';
-  svgWrap.innerHTML = `<svg width="100%" viewBox="0 0 560 340" style="display:block;max-width:100%;height:auto;">
+  svgWrap.id = 'solid-svg-wrap';
+  svgWrap.setAttribute('onclick', 'openSolidSvg()');
+  svgWrap.innerHTML = `<svg id="solid-svg" width="100%" viewBox="0 0 560 340" style="display:block;max-width:100%;height:auto;">
 <defs>
   <linearGradient id="axG2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f0f0f0"/><stop offset="100%" stop-color="#1a1a1a"/></linearGradient>
   <linearGradient id="lG2" x1="1" y1="0" x2="0" y2="0"><stop offset="0%" stop-color="#888" stop-opacity="0"/><stop offset="100%" stop-color="#e05050"/></linearGradient>
-  <linearGradient id="rG2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#888" stop-opacity="0"/><stop offset="100%" stop-color="#4a90d9"/></linearGradient>
+  <linearGradient id="rG2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#888" stop-opacity="0"/><stop offset="100%" stop-color="#107060"/></linearGradient>
 </defs>
 <rect x="271" y="44" width="18" height="252" rx="4" fill="url(#axG2)" stroke="#ddd" stroke-width="0.5"/>
 <path d="M271,76 Q198,112 136,170 Q198,228 271,260 Z" fill="url(#lG2)" opacity="0.7"/>
 <path d="M271,76 Q198,112 136,170 Q198,228 271,260" fill="none" stroke="#e05050" stroke-width="1.5" stroke-dasharray="5 3"/>
 <path d="M289,76 Q362,112 424,170 Q362,228 289,260 Z" fill="url(#rG2)" opacity="0.7"/>
-<path d="M289,76 Q362,112 424,170 Q362,228 289,260" fill="none" stroke="#4a90d9" stroke-width="1.5" stroke-dasharray="5 3"/>
+<path d="M289,76 Q362,112 424,170 Q362,228 289,260" fill="none" stroke="#107060" stroke-width="1.5" stroke-dasharray="5 3"/>
 <circle cx="136" cy="170" r="8" fill="#e05050" stroke="white" stroke-width="2"/>
-<circle cx="424" cy="170" r="8" fill="#4a90d9" stroke="white" stroke-width="2"/>
-<text x="96"  y="155" text-anchor="middle" font-size="12" fill="#c04040" font-weight="500" font-family="Meiryo UI,sans-serif">純色（赤）</text>
-<text x="96"  y="170" text-anchor="middle" font-size="10" fill="#aaa" font-family="Meiryo UI,sans-serif">v2</text>
-<text x="464" y="155" text-anchor="middle" font-size="12" fill="#2a70b9" font-weight="500" font-family="Meiryo UI,sans-serif">純色（青）</text>
-<text x="464" y="170" text-anchor="middle" font-size="10" fill="#aaa" font-family="Meiryo UI,sans-serif">v18</text>
-<text x="280" y="38"  text-anchor="middle" font-size="11" fill="#888" font-family="Meiryo UI,sans-serif">白（W）　← 高明度</text>
-<text x="280" y="310" text-anchor="middle" font-size="11" fill="#888" font-family="Meiryo UI,sans-serif">黒（Bk）　← 低明度</text>
+<circle cx="424" cy="170" r="8" fill="#107060" stroke="white" stroke-width="2"/>
+<text x="96"  y="155" text-anchor="middle" font-size="17" fill="#c04040" font-weight="500" font-family="Meiryo UI,sans-serif">純色（赤）</text>
+<text x="96"  y="170" text-anchor="middle" font-size="17" fill="#aaa" font-family="Meiryo UI,sans-serif">v2</text>
+<text x="464" y="155" text-anchor="middle" font-size="17" fill="#107060" font-weight="500" font-family="Meiryo UI,sans-serif">純色（青緑）</text>
+<text x="464" y="170" text-anchor="middle" font-size="17" fill="#aaa" font-family="Meiryo UI,sans-serif">v14</text>
+<text x="280" y="38"  text-anchor="middle" font-size="16" fill="#888" font-family="Meiryo UI,sans-serif">白（W）　← 高明度</text>
+<text x="280" y="310" text-anchor="middle" font-size="16" fill="#888" font-family="Meiryo UI,sans-serif">黒（Bk）　← 低明度</text>
 <line x1="279" y1="170" x2="144" y2="170" stroke="#e05050" stroke-width="1" stroke-dasharray="3 3" opacity="0.5"/>
-<line x1="289" y1="170" x2="416" y2="170" stroke="#4a90d9" stroke-width="1" stroke-dasharray="3 3" opacity="0.5"/>
-<text x="207" y="158" text-anchor="middle" font-size="10" fill="#c04040" font-family="Meiryo UI,sans-serif">← 彩度高</text>
-<text x="353" y="158" text-anchor="middle" font-size="10" fill="#2a70b9" font-family="Meiryo UI,sans-serif">彩度高 →</text>
-<text x="280" y="186" text-anchor="middle" font-size="10" fill="#999" font-family="Meiryo UI,sans-serif">↑ 中心 = 無彩色（灰・黒・白）</text>
-<text x="280" y="328" text-anchor="middle" font-size="10" fill="#aaa" font-family="Meiryo UI,sans-serif">※赤の純色は中明度、青は中高明度など色相で位置が異なる</text>
+<line x1="289" y1="170" x2="416" y2="170" stroke="#107060" stroke-width="1" stroke-dasharray="3 3" opacity="0.5"/>
+<text x="207" y="148" text-anchor="middle" font-size="15" fill="#c04040" font-family="Meiryo UI,sans-serif">← 彩度高</text>
+<text x="353" y="148" text-anchor="middle" font-size="15" fill="#2a70b9" font-family="Meiryo UI,sans-serif">彩度高 →</text>
+<text x="280" y="202" text-anchor="middle" font-size="13" fill="#999" font-family="Meiryo UI,sans-serif">↑ 中心 = 無彩色（灰・黒・白）</text>
+<text x="280" y="328" text-anchor="middle" font-size="17" fill="#aaa" font-family="Meiryo UI,sans-serif">※赤（v2）と青緑（v14）は補色関係。純色の明度は色相によって異なる</text>
 </svg>`;
   svgWrap.title = 'タップで拡大';
   // タップ時にSVGをライトボックスで表示
-  svgWrap.addEventListener('click', () => {
-    const svgEl = svgWrap.querySelector('svg');
-    // 白背景のrectを一時的に追加
-    const ns = 'http://www.w3.org/2000/svg';
-    const bg = document.createElementNS(ns, 'rect');
-    const vb = svgEl.getAttribute('viewBox').split(' ');
-    bg.setAttribute('x', vb[0]); bg.setAttribute('y', vb[1]);
-    bg.setAttribute('width', vb[2]); bg.setAttribute('height', vb[3]);
-    bg.setAttribute('fill', 'white');
-    svgEl.insertBefore(bg, svgEl.firstChild);
-    const serializer = new XMLSerializer();
-    const svgStr = serializer.serializeToString(svgEl);
-    svgEl.removeChild(bg); // 元に戻す
-    const blob = new Blob([svgStr], {type:'image/svg+xml'});
-    const url = URL.createObjectURL(blob);
-    openImgLightbox(url);
-  });
+
   wrap.appendChild(svgWrap);
 
   return wrap;
@@ -2263,6 +2307,36 @@ function getDiagramEye() {
 // ============================================================
 //  画像ライトボックス
 // ============================================================
+function openSolidSvg() {
+  const svgEl = document.getElementById('solid-svg');
+  if (!svgEl) return;
+  const vb = svgEl.getAttribute('viewBox').split(' ').map(Number);
+  const w = vb[2], h = vb[3];
+  const ns = 'http://www.w3.org/2000/svg';
+  const bg = document.createElementNS(ns, 'rect');
+  bg.setAttribute('x', vb[0]); bg.setAttribute('y', vb[1]);
+  bg.setAttribute('width', w); bg.setAttribute('height', h);
+  bg.setAttribute('fill', 'white');
+  svgEl.insertBefore(bg, svgEl.firstChild);
+  const svgStr = new XMLSerializer().serializeToString(svgEl);
+  svgEl.removeChild(bg);
+  const scale = 2;
+  const canvas = document.createElement('canvas');
+  canvas.width = w * scale; canvas.height = h * scale;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const imgEl = new Image();
+  const blob = new Blob([svgStr], {type:'image/svg+xml'});
+  const url = URL.createObjectURL(blob);
+  imgEl.onload = () => {
+    ctx.drawImage(imgEl, 0, 0, canvas.width, canvas.height);
+    URL.revokeObjectURL(url);
+    openImgLightbox(canvas.toDataURL('image/png'));
+  };
+  imgEl.src = url;
+}
+
 function openImgLightbox(src) {
   document.getElementById('img-lightbox-img').src = src;
   document.getElementById('img-lightbox').classList.add('open');
